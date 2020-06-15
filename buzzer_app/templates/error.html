@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block body %}
+{% include 'navbar.html'%}
+<div class="container-fluid">
+    <header class="jumbotron text-center" style="padding-top: 8rem">
+        <h1><b>APPLICATION ERROR</b></h1>
+    </header>
+    <h3>The following error occurred</h3>
+    Error Type: {{ error_type }}<br>
+    Error contents: {{ error }}
+</div>
+{% endblock %}

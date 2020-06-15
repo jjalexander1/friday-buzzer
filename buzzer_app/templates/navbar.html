@@ -1,0 +1,24 @@
+ <nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+      <div class="navbar-header">
+          {% if room_id %}
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#collapsableNavbarComponents" id="toggle_dropdown">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          {% endif %}
+          <a class="navbar-brand" href="/">Home</a>
+      </div>
+      {% if room_id %}
+        <div id="collapsableNavbarComponents" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+              <li><a class="active" data-toggle="tab" href="#buzzer" role="tab" aria-controls="home" aria-selected="true"><span class="glyphicon glyphicon-play-circle"></span>  Buzzer</a></li>
+              <li><a data-toggle="tab" href="#scoreboard" role="tab" aria-controls="profile" aria-selected="false"><span class="glyphicon glyphicon-stats"></span>  Scoreboard</a></li>
+              <li><a data-toggle="tab" href="#host" role="tab" aria-controls="profile" aria-selected="false"><span class="glyphicon glyphicon-user"></span>  Host</a></li>
+              <li><a data-toggle="tab" href="#settings" role="tab" aria-controls="contact" aria-selected="false"><span class="glyphicon glyphicon-cog"></span>  Settings</a></li>
+             </ul>
+        </div>
+      {% endif %}
+  </div>
+ </nav>

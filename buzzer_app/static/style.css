@@ -1,0 +1,81 @@
+html, body {
+    top:0;
+    bottom: 0px;
+    left:0;
+    right:0;
+    height: 100%;
+    zoom: 110%;
+}
+
+
+button#correct {
+    background-color: #4CAF50;
+}
+
+button#incorrect {
+    background-color: #FF0000;
+}
+
+
+.tab-pane {
+    position: relative;
+    top: 0;
+}
+
+
+.host-wrapper {
+    padding: 3%;
+}
+
+.host-button:focus, .host-button:active {
+   outline: none;
+   box-shadow: none;
+}
+
+.host-button {
+    min-height: 75px;
+}
+
+.host-button-wrapper {
+    min-height: 75px;
+    padding-bottom: 5px;
+}
+
+
+#buzz:focus, #buzz:active {
+   outline: none;
+   box-shadow: none;
+}
+
+.settings-wrapper {
+    overflow: auto;
+    padding-bottom: 2%;
+}
+
+#buzz {
+    padding: 5%;
+    min-height: 200px;
+}
+
+.buzz-log {
+    padding-top: 15px;
+}
+
+.small-dark-footer {
+    background-color: #222;
+    font-size: 10px;
+    padding: 10px;
+}
+
+.header-box-outer {
+    padding-bottom: 10px;
+}
+
+.header-box-inner {
+    background-color: #C0C0C0;
+    padding: 1%;
+}
+
+.settings-wrapper {
+    padding-bottom: 40px;
+}
