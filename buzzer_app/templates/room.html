@@ -181,6 +181,7 @@ $(document).ready(function () {
            } else {
               for (element of current_buzzes) {
                 if (element.name == "{{ participant_name }}") {
+                  $("#buzz").removeClass("btn-danger")
                   $("#buzz").addClass("btn-warning")
                   $("#buzz").html("<b>Someone beat you to it...</b><br>Please wait")
                   break;
