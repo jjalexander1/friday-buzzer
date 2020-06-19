@@ -159,13 +159,15 @@ $(document).ready(function () {
           <th scope="col">#</th>
           <th scope="col">Participant</th>
           <th scope="col">Score</th>
+          <th scope="col">Correct</th>
+          <th scope="col">Early Incorrect</th>
         </tr>
       </thead>
       <tbody>
       `
       var pos = 1;
       for (player of player_scores) {
-        new_scoreboard_html += `<tr><th scope="row">` + pos + `</th><td>` + player.name + `</td><td>` + player.score + `</td></tr>`
+        new_scoreboard_html += `<tr><th scope="row">` + pos + `</th><td>` + player.name + `</td><td>` + player.score + `</td><td>` + player.correct_answers + `</td><td>` + player.early_incorrect_answers + `</td></tr>`
         pos += 1
       }
       new_scoreboard_html += "</tbody></table>"

@@ -100,7 +100,9 @@ class BuzzerRoom(object):
 
     def mark_correct(self):
         if self.buzzes:
-            self.players[self.buzzes.pop(0)['name']].score += self.config['correct_points']
+            player_name = self.buzzes.pop(0)['name']
+            self.players[player_name].score += self.config['correct_points']
+            self.players[player_name].correct_answers += 1
         self.reset_buzzer()
         self.update_last_changed_at()
 
@@ -111,7 +113,9 @@ class BuzzerRoom(object):
 
     def mark_early_incorrect(self):
         if self.buzzes:
-            self.players[self.buzzes.pop(0)['name']].score -= self.config['early_incorrect_points']
+            player_name = self.buzzes.pop(0)['name']
+            self.players[player_name].score -= self.config['early_incorrect_points']
+            self.players[player_name].early_incorrect_answers += 1
         self.update_last_changed_at()
 
     def add_player(self, participant_name):
@@ -129,6 +133,8 @@ class BuzzerRoom(object):
     def reset_all_scores(self):
         for player in self.players.values():
             player.score = 0
+            player.correct_answers = 0
+            player.early_incorrect_answers = 0
 
     def update_setting(self, key, value):
         if key in self.config.keys():
@@ -136,7 +142,8 @@ class BuzzerRoom(object):
         self.update_last_changed_at()
 
     def get_scoreboard(self):
-        scores = [dict(name=player.name, score=player.score) for player in self.players.values()]
+        scores = [dict(name=player.name, score=player.score, correct_answers=player.correct_answers,
+                       early_incorrect_answers=player.early_incorrect_answers) for player in self.players.values()]
         return sorted(scores, key=lambda x: x['score'], reverse=True)
 
     def sort_buzzes(self):
@@ -159,6 +166,8 @@ class Player(object):
     def __init__(self, name):
         self.name = name
         self.score = 0
+        self.correct_answers = 0
+        self.early_incorrect_answers = 0
 
         self.ping_offsets = []
 
