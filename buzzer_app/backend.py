@@ -95,7 +95,7 @@ class BuzzerRoom(object):
                 print('offset: {}'.format(player.offset))
             elif self.config['time_evaluation_method'] == 'another':
                 if 'max' in name.lower():
-                    server_side_time += 1000
+                    server_side_time += 1
                 self.buzzes.append({'name': name, "time": server_side_time})
 
     def mark_correct(self):
