@@ -16,5 +16,5 @@ class RoomSettingsForm(FlaskForm):
                                          render_kw={'class': 'form-control',
                                                     'id': 'timeEvaluationMethodInput',
                                                     'aria-describedby': 'timeEvaluationMethodHelp'},
-                                         choices=['server', 'client', 'client_with_offset_correction'])
+                                         choices=['server', 'client', 'client_with_offset_correction', 'another'])
     sort_latency = IntegerField("Sort Latency")
