@@ -56,6 +56,7 @@ class BuzzerRoom(object):
 
         self.buzzes = []
         self.players = {}
+        self.last_correct_player = None
 
         self.created_time = datetime.datetime.now().timestamp()
         self.last_active_time = datetime.datetime.now().timestamp()
@@ -64,7 +65,8 @@ class BuzzerRoom(object):
         self.config = dict(correct_points=10,
                            early_incorrect_points=5,
                            sort_latency=1000,  # ms to wait before sorting people's buzzes -- this ensures fairness! time evaluated client-side
-                           time_evaluation_method='server'
+                           time_evaluation_method='server',
+                           one_buzz_per_question=True
                            )
 
     @property
@@ -80,9 +82,12 @@ class BuzzerRoom(object):
 
     def reset_buzzer(self):
         self.buzzes = []
+        for player in self.players.values():
+            player.locked_out = False
         self.update_last_changed_at()
 
     def buzz(self, name, client_side_time, server_side_time):
+        player = None
         if name not in self.currently_buzzed_player_names:
             if self.config['time_evaluation_method'] == 'server':
                 self.buzzes.append({'name': name, "time": server_side_time})
@@ -97,12 +102,26 @@ class BuzzerRoom(object):
                 if 'max' in name.lower():
                     server_side_time += 1
                 self.buzzes.append({'name': name, "time": server_side_time})
+        if self.config['one_buzz_per_question']:
+            if not player:
+                player = self.get_player(participant_name=name)
+                player.locked_out = True
+
+    def update_current_streaks(self, correct_player):
+        for player in self.players.values():
+            if player.name == correct_player:
+                player.current_streak += 1
+                player.update_longest_streak()
+            else:
+                player.current_streak = 0
 
     def mark_correct(self):
         if self.buzzes:
             player_name = self.buzzes.pop(0)['name']
             self.players[player_name].score += self.config['correct_points']
             self.players[player_name].correct_answers += 1
+            self.update_current_streaks(correct_player=player_name)
+            self.last_correct_player = player_name
         self.reset_buzzer()
         self.update_last_changed_at()
 
@@ -132,22 +151,20 @@ class BuzzerRoom(object):
 
     def reset_all_scores(self):
         for player in self.players.values():
-            player.score = 0
-            player.correct_answers = 0
-            player.early_incorrect_answers = 0
-
-    def update_setting(self, key, value):
-        if key in self.config.keys():
-            self.config[key] = value
-        self.update_last_changed_at()
+            player.reset()
 
     def get_scoreboard(self):
         scores = [dict(name=player.name, score=player.score, correct_answers=player.correct_answers,
-                       early_incorrect_answers=player.early_incorrect_answers) for player in self.players.values()]
+                       early_incorrect_answers=player.early_incorrect_answers,
+                       current_streak=player.current_streak,
+                       longest_streak=player.longest_streak) for player in self.players.values()]
         return sorted(scores, key=lambda x: x['score'], reverse=True)
 
     def sort_buzzes(self):
         return sorted(self.buzzes, key=lambda x: x['time'])
+
+    def get_locked_out_players(self):
+        return [p.name for p in self.players.values() if p.locked_out]
 
     def update_config(self, config):
         for key, value in config.items():
@@ -156,8 +173,10 @@ class BuzzerRoom(object):
 
     def get_room_state(self):
         state = {}
+
         state['scoreboard'] = self.get_scoreboard()
         state['current_buzzes'] = self.sort_buzzes()
+        state['locked_out_players'] = self.get_locked_out_players()
         state['config'] = self.config
         return json.dumps(state)
 
@@ -165,16 +184,27 @@ class BuzzerRoom(object):
 class Player(object):
     def __init__(self, name):
         self.name = name
+        self.reset()
+
+        self.longest_streak = 0
+        self.ping_offsets = []
+
+    def reset(self):
         self.score = 0
         self.correct_answers = 0
         self.early_incorrect_answers = 0
-
-        self.ping_offsets = []
+        self.locked_out = False
+        self.current_streak = 0
+        self.longest_streak = 0
 
     def add_ping_offset(self, offset, max_offsets=10):
         self.ping_offsets.append(offset)
         if len(self.ping_offsets) >= max_offsets:
             self.ping_offsets.pop(0)
+
+    def update_longest_streak(self):
+        if self.current_streak > self.longest_streak:
+            self.longest_streak = self.current_streak
 
     @property
     def offset(self):

@@ -63,12 +63,13 @@ def room(room_id):
         return redirect(url_for("home"))
 
     form = RoomSettingsForm(request.form)
-    if form.correct_points.data is not None or form.early_incorrect_points.data is not None or form.sort_latency.data is not None or form.time_evaluation_method.data is not None:
+    if form.correct_points.data is not None or form.early_incorrect_points.data is not None or form.sort_latency.data is not None or form.time_evaluation_method.data is not None or form.one_buzz_per_question.data is not None:
         global room_manager
         room = room_manager.get_room(room_id)
         config = dict(correct_points=form.correct_points.data,
                       early_incorrect_points=form.early_incorrect_points.data,
                       sort_latency=form.sort_latency.data,
+                      one_buzz_per_question=form.one_buzz_per_question.data,
                       time_evaluation_method=form.time_evaluation_method.data)
         room.update_config(config)
     return render_template("room.html", form=form, room_id=room_id, participant_name=participant_name)

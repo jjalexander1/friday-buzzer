@@ -11,7 +11,7 @@
   <div id="buzzer" class="tab-pane fade in active">
     <div class="buzzer-wrapper container-fluid">
       <div>
-        <button type="button" id="buzz" class="btn btn-light btn-block">Buzz</button>
+        <button type="button" id="buzz" class="btn btn-danger btn-block">Buzz</button>
       </div>
       <div>
       <div class="container-fluid text-center" style="padding-top: 15px;">
@@ -32,6 +32,10 @@
             <th scope="col">#</th>
             <th scope="col">Participant</th>
             <th scope="col">Score</th>
+            <th scope="col">Correct</th>
+            <th scope="col">Early Incorrect</th>
+            <th scope="col">Current Streak</th>
+            <th scope="col">Longest Streak</th>
           </tr>
         </thead>
       </table>
@@ -79,8 +83,13 @@
           <small id="earlyIncorrectPointsHelp" class="form-text text-muted">Points to subtract for an early incorrect answer</small>
         </div>
         <div class="form-group">
+          <label for="oneBuzzPerQuestionInput">One Buzz Per Question</label>
+          {{ form.one_buzz_per_question }}  <!-- templating using the form object since there is not input 'type' for dropdowns, you would need to use a 'select' element -->
+          <small id="oneBuzzPerQuestionHelp" class="form-text text-muted">Whether a player should be locked out after guessing</small>
+        </div>
+        <div class="form-group">
           <label for="TimeEvaluationMethodInput">Buzz Time Evaluation Method</label>
-          {{ form.time_evaluation_method }}
+          {{ form.time_evaluation_method }} <!-- templating using the form object since there is not input 'type' for dropdowns, you would need to use a 'select' element -->
           <small id="timeEvaluationMethodHelp" class="form-text text-muted">The method that will be used to determine who has buzzed the fastest</small>
         </div>
         <div class="form-group">
@@ -122,6 +131,7 @@
 
 $(document).ready(function () {
     var buzzes = [];
+    var locked_out_players = [];
 
     // functions to update page js, called by socket server update handlers
     function updateBuzzLog(current_buzzes) {
@@ -161,13 +171,15 @@ $(document).ready(function () {
           <th scope="col">Score</th>
           <th scope="col">Correct</th>
           <th scope="col">Early Incorrect</th>
+          <th scope="col">Current Streak</th>
+          <th scope="col">Longest Streak</th>
         </tr>
       </thead>
       <tbody>
       `
       var pos = 1;
       for (player of player_scores) {
-        new_scoreboard_html += `<tr><th scope="row">` + pos + `</th><td>` + player.name + `</td><td>` + player.score + `</td><td>` + player.correct_answers + `</td><td>` + player.early_incorrect_answers + `</td></tr>`
+        new_scoreboard_html += `<tr><th scope="row">` + pos + `</th><td>` + player.name + `</td><td>` + player.score + `</td><td>` + player.correct_answers + `</td><td>` + player.early_incorrect_answers + `</td><td>` + player.current_streak + `</td><td>` + player.longest_streak + `</td></tr>`
         pos += 1
       }
       new_scoreboard_html += "</tbody></table>"
@@ -175,24 +187,39 @@ $(document).ready(function () {
       $(".buzzer-scores-table").html(new_scoreboard_html)
     }
 
-    function updateBuzzerColour(current_buzzes) {
-        if (current_buzzes.length > 0) {
-           if (current_buzzes[0].name == "{{ participant_name }}") {
-              $("#buzz").addClass("btn-danger")
-              $("#buzz").html("<b>ANSWER NOW</b>")
-           } else {
-              for (element of current_buzzes) {
-                if (element.name == "{{ participant_name }}") {
-                  $("#buzz").removeClass("btn-danger")
-                  $("#buzz").addClass("btn-warning")
-                  $("#buzz").html("<b>Someone beat you to it...</b><br>Please wait")
-                  break;
-                }
-              };
-           }
-        } else {
+    function nameInCurrentBuzzes(participant_name, current_buzzes) {
+        for (element of current_buzzes) {
+            if (element.name == participant_name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function updateBuzzerColour(current_buzzes, locked_out_players) {
+       if (current_buzzes.length > 0 && current_buzzes[0].name == "{{ participant_name }}") {
            $("#buzz").removeClass("btn-danger")
            $("#buzz").removeClass("btn-warning")
+           $("#buzz").removeClass("btn-light")
+           $("#buzz").addClass("btn-success")
+           $("#buzz").html("<b>ANSWER NOW</b>")
+       } else if (current_buzzes.length > 0 && nameInCurrentBuzzes("{{ participant_name }}", current_buzzes)) {
+             $("#buzz").removeClass("btn-danger")
+             $("#buzz").removeClass("btn-success")
+             $("#buzz").removeClass("btn-light")
+             $("#buzz").addClass("btn-warning")
+             $("#buzz").html("<b>Someone beat you to it...</b><br>Please wait")
+       } else if (locked_out_players.includes("{{ participant_name }}")) {
+             $("#buzz").removeClass("btn-danger")
+             $("#buzz").removeClass("btn-warning")
+             $("#buzz").removeClass("btn-success")
+             $("#buzz").addClass("btn-light")
+             $("#buzz").html("<b>You have already buzzed this question</b><br>If this is not expected, ask for a reset")
+        } else {
+           $("#buzz").removeClass("btn-success")
+           $("#buzz").removeClass("btn-warning")
+           $("#buzz").removeClass("btn-light")
+           $("#buzz").addClass("btn-danger")
            $("#buzz").html("Buzz")
         }
     };
@@ -201,6 +228,7 @@ $(document).ready(function () {
       $("#correctPointsInput").val(config.correct_points)
       $("#earlyIncorrectPointsInput").val(config.early_incorrect_points)
       $("#timeEvaluationMethodInput").val(config.time_evaluation_method)
+      $("#oneBuzzPerQuestionInput").val(config.one_buzz_per_question.toString())
       $("#sortLatencyInput").val(config.sort_latency)
     };
 
@@ -226,6 +254,12 @@ $(document).ready(function () {
       for (buzz of buzzes) {
           if (buzz.name == '{{ participant_name }}') {
               console.log('{{ participant_name }}' + "already buzzed")
+              return;
+          }
+      }
+      for (player_name of locked_out_players) {
+          if (player_name == '{{ participant_name }}') {
+              console.log('{{ participant_name }}' + "is locked out")
               return;
           }
       }
@@ -274,9 +308,10 @@ $(document).ready(function () {
       console.log("Server updated the room");
       payload = JSON.parse(payload);
       buzzes = payload.current_buzzes
+      locked_out_players = payload.locked_out_players
       updateBuzzLog(buzzes);
       updateScoreboard(payload.scoreboard);
-      updateBuzzerColour(payload.current_buzzes);
+      updateBuzzerColour(payload.current_buzzes, payload.locked_out_players);
       updateSettings(payload.config);
     });
 
