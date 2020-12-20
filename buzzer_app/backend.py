@@ -112,7 +112,6 @@ class BuzzerRoom(object):
         self.play_audio = len(self.buzzes) == 1  # play the buzzer audio whenever people buzz for the first time
         print("n buzzes {}, play_audio {}".format(len(self.buzzes), self.play_audio))
 
-
     def update_current_streaks(self, correct_player):
         for player in self.players.values():
             if player.name == correct_player:
