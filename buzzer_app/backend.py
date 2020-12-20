@@ -28,7 +28,7 @@ class RoomManager(object):
         if isinstance(old_room, BuzzerRoom) and old_room.id in self.rooms.keys():
             del self.rooms[old_room.id]
 
-    def cleanup_rooms(self):  # currently run every time a buzzer is reset, point is we just need to do it infrequently
+    def cleanup_rooms(self):  # currently not run
         current_time = datetime.datetime.now().timestamp()
         to_delete = []
         for room in self.rooms.values():
@@ -57,6 +57,7 @@ class BuzzerRoom(object):
         self.buzzes = []
         self.players = {}
         self.last_correct_player = None
+        self.play_audio = False
 
         self.created_time = datetime.datetime.now().timestamp()
         self.last_active_time = datetime.datetime.now().timestamp()
@@ -82,6 +83,7 @@ class BuzzerRoom(object):
 
     def reset_buzzer(self):
         self.buzzes = []
+        self.play_audio = False  # make so the buzzer audio plays again next time for first buzzer
         for player in self.players.values():
             player.locked_out = False
         self.update_last_changed_at()
@@ -106,6 +108,10 @@ class BuzzerRoom(object):
             if not player:
                 player = self.get_player(participant_name=name)
                 player.locked_out = True
+
+        self.play_audio = len(self.buzzes) == 1  # play the buzzer audio whenever people buzz for the first time
+        print("n buzzes {}, play_audio {}".format(len(self.buzzes), self.play_audio))
+
 
     def update_current_streaks(self, correct_player):
         for player in self.players.values():
@@ -173,10 +179,10 @@ class BuzzerRoom(object):
 
     def get_room_state(self):
         state = {}
-
         state['scoreboard'] = self.get_scoreboard()
         state['current_buzzes'] = self.sort_buzzes()
         state['locked_out_players'] = self.get_locked_out_players()
+        state['play_audio'] = self.play_audio
         state['config'] = self.config
         return json.dumps(state)
 

@@ -3,7 +3,11 @@
 {% include 'navbar.html' %}
 <div class="header-box-outer">
   <div class="header-box-inner text-center">
-      <h3>Currently in room <b>{{ room_id }}</b></h3>
+    <h3>Playing in room <b>{{ room_id }}</b>
+      <button id="audio_button" checked="true">
+        <img src="{{ url_for('static',filename='images/audio_on_icon.svg') }}"/>
+      </button>
+    </h3>
   </div>
 </div>
 
@@ -132,6 +136,7 @@
 $(document).ready(function () {
     var buzzes = [];
     var locked_out_players = [];
+    var audio = new Audio('{{ url_for('static',filename='audio/buzz.mp3') }}');
 
     // functions to update page js, called by socket server update handlers
     function updateBuzzLog(current_buzzes) {
@@ -309,6 +314,11 @@ $(document).ready(function () {
       payload = JSON.parse(payload);
       buzzes = payload.current_buzzes
       locked_out_players = payload.locked_out_players
+      console.log(payload.play_audio);
+      if (payload.play_audio) {
+        audio.play();
+      }
+
       updateBuzzLog(buzzes);
       updateScoreboard(payload.scoreboard);
       updateBuzzerColour(payload.current_buzzes, payload.locked_out_players);
@@ -327,9 +337,17 @@ $(document).ready(function () {
                            "room_id": '{{ room_id }}',
                            "client_side_time": time})
     };
-
-    //TODO generic construct payload
-
+    $("#audio_button").on("click", function () {
+        if (audio.muted) {
+          audio.muted = false;
+          this.innerHTML = "<img src='{{ url_for('static',filename='images/audio_on_icon.svg') }}'/>";
+          console.log("turned on audio");
+        } else {
+          audio.muted = true;
+          this.innerHTML = "<img src='{{ url_for('static',filename='images/audio_off_icon.svg') }}'/>";
+          console.log("turned OFF audio");
+        }
+    });
     ping(); // do immediately on page load
     window.setInterval(function(){
           ping();

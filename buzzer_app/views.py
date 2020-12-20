@@ -17,7 +17,6 @@ app = Flask(__name__)
 app.config.from_object('config')
 socketio = SocketIO(async_mode="eventlet")
 namespace = '/friday_buzzer'
-BAD_CHARS = ["\"", "\'"]
 thread = None
 room_manager = RoomManager()
 
@@ -54,13 +53,12 @@ def home():
 def room(room_id):
     participant_name = request.args.get('participant_name')
     global BAD_CHARS
-    for char in BAD_CHARS:
-        if char in participant_name:
-            raise Exception("Participant name provided contained disallowed characters")
-        if char in room_id:
-            raise Exception("Room name provided contained disallowed characters")
     if not participant_name:  # force players to go through the homepage, don't bother erroring
         return redirect(url_for("home"))
+    if not participant_name.replace(" ", "").isalnum():
+        raise Exception("Participant name provided contained disallowed characters")
+    if not room_id.replace(" ", "").isalnum():
+        raise Exception("Room name provided contained disallowed characters")
 
     form = RoomSettingsForm(request.form)
     if form.correct_points.data is not None or form.early_incorrect_points.data is not None or form.sort_latency.data is not None or form.time_evaluation_method.data is not None or form.one_buzz_per_question.data is not None:
@@ -109,7 +107,7 @@ def handle_buzzer_reset(data):
 @socketio.on('reset_room_scores', namespace=namespace)
 def handle_scores_reset(data):
     global room_manager
-    room_manager.cleanup_rooms()
+    #room_manager.cleanup_rooms()  # for now don't do any room cleanup, just store all historic data
     room = room_manager.get_room(data['room_id'])
     room.reset_all_scores()
     payload = room.get_room_state()
@@ -200,7 +198,7 @@ def send_message_to_room(payload, room_id):  # wrap a room broadcast message
 def log_message_received(sent_from, room, event_name, sent_time=datetime.datetime.now().timestamp()):
     if isinstance(sent_time, float):
         sent_time = datetime.datetime.fromtimestamp(sent_time)
-    print('{sent_time} - [Room {room}]: {sent_from} sent event {event_name}'.format(sent_time=sent_time,
-                                                                                    room=room,
-                                                                                    sent_from=sent_from,
-                                                                                    event_name=event_name))
+    print('{sent_time}, Room: {room} -- Player {sent_from} sent event {event_name}'.format(sent_time=sent_time,
+                                                                                           room=room,
+                                                                                           sent_from=sent_from,
+                                                                                           event_name=event_name))
