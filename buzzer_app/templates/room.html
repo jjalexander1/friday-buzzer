@@ -314,7 +314,7 @@ $(document).ready(function () {
       payload = JSON.parse(payload);
       buzzes = payload.current_buzzes
       locked_out_players = payload.locked_out_players
-      console.log(payload.play_audio);
+
       if (payload.play_audio) {
         audio.play();
       }

@@ -20,6 +20,9 @@ namespace = '/friday_buzzer'
 thread = None
 room_manager = RoomManager()
 
+LOCALHOST_URL_IDENTIFIERS = ['//localhost',
+                             '//127.0.0.1',
+                             '//0.0.0.0']
 
 # def background_thread():
 #     """Example of how to send server generated events to clients."""
@@ -34,7 +37,14 @@ room_manager = RoomManager()
 
 @app.before_request
 def before_request():  # force to use https
-    if request.url.startswith('http://'):
+    for l in LOCALHOST_URL_IDENTIFIERS:
+        if l in request.url:
+            if request.url.startswith('https://'):
+                url = request.url.replace('https://', 'http://', 1)  # flask doesn't like https requests on localhost
+                code = 301
+                return redirect(url, code=code)
+            return
+    if request.url.startswith('http://'):  # otherwise always use https
         url = request.url.replace('http://', 'https://', 1)
         code = 301
         return redirect(url, code=code)
@@ -42,6 +52,7 @@ def before_request():  # force to use https
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    print('hi')
     global room_manager
     busiest_rooms = room_manager.get_busiest_rooms()
 

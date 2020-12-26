@@ -78,17 +78,18 @@ class BuzzerRoom(object):
     def n_players(self):
         return len(self.players.keys())
 
-    def update_last_changed_at(self):
+    def _pre_state_update(self):
         self.last_active_time = datetime.datetime.now().timestamp()
+        self.play_audio = False  # make so the buzzer audio plays again next time for first buzzer
 
     def reset_buzzer(self):
+        self._pre_state_update()
         self.buzzes = []
-        self.play_audio = False  # make so the buzzer audio plays again next time for first buzzer
         for player in self.players.values():
             player.locked_out = False
-        self.update_last_changed_at()
 
     def buzz(self, name, client_side_time, server_side_time):
+        self._pre_state_update()
         player = None
         if name not in self.currently_buzzed_player_names:
             if self.config['time_evaluation_method'] == 'server':
@@ -110,7 +111,6 @@ class BuzzerRoom(object):
                 player.locked_out = True
 
         self.play_audio = len(self.buzzes) == 1  # play the buzzer audio whenever people buzz for the first time
-        print("n buzzes {}, play_audio {}".format(len(self.buzzes), self.play_audio))
 
     def update_current_streaks(self, correct_player):
         for player in self.players.values():
@@ -121,6 +121,7 @@ class BuzzerRoom(object):
                 player.current_streak = 0
 
     def mark_correct(self):
+        self._pre_state_update()
         if self.buzzes:
             player_name = self.buzzes.pop(0)['name']
             self.players[player_name].score += self.config['correct_points']
@@ -128,21 +129,21 @@ class BuzzerRoom(object):
             self.update_current_streaks(correct_player=player_name)
             self.last_correct_player = player_name
         self.reset_buzzer()
-        self.update_last_changed_at()
 
     def mark_standard_incorrect(self):
+        self._pre_state_update()
         if self.buzzes:
             self.buzzes.pop(0)
-        self.update_last_changed_at()
 
     def mark_early_incorrect(self):
+        self._pre_state_update()
         if self.buzzes:
             player_name = self.buzzes.pop(0)['name']
             self.players[player_name].score -= self.config['early_incorrect_points']
             self.players[player_name].early_incorrect_answers += 1
-        self.update_last_changed_at()
 
     def add_player(self, participant_name):
+        self._pre_state_update()
         if participant_name not in self.players.keys():
             new_player = Player(name=participant_name)
             self.players[participant_name] = new_player
@@ -151,24 +152,25 @@ class BuzzerRoom(object):
         return self.players[participant_name]
 
     def remove_player(self, participant_name):
+        self._pre_state_update()
         del self.players[participant_name]
-        self.update_last_changed_at()
 
     def reset_all_scores(self):
+        self._pre_state_update()
         for player in self.players.values():
             player.reset()
 
-    def get_scoreboard(self):
+    def _get_scoreboard(self):
         scores = [dict(name=player.name, score=player.score, correct_answers=player.correct_answers,
                        early_incorrect_answers=player.early_incorrect_answers,
                        current_streak=player.current_streak,
                        longest_streak=player.longest_streak) for player in self.players.values()]
         return sorted(scores, key=lambda x: x['score'], reverse=True)
 
-    def sort_buzzes(self):
+    def _sort_buzzes(self):
         return sorted(self.buzzes, key=lambda x: x['time'])
 
-    def get_locked_out_players(self):
+    def _get_locked_out_players(self):
         return [p.name for p in self.players.values() if p.locked_out]
 
     def update_config(self, config):
@@ -178,9 +180,11 @@ class BuzzerRoom(object):
 
     def get_room_state(self):
         state = {}
-        state['scoreboard'] = self.get_scoreboard()
-        state['current_buzzes'] = self.sort_buzzes()
-        state['locked_out_players'] = self.get_locked_out_players()
+
+        state['scoreboard'] = self._get_scoreboard()
+        state['current_buzzes'] = self._sort_buzzes()
+        state['locked_out_players'] = self._get_locked_out_players()
+
         state['play_audio'] = self.play_audio
         state['config'] = self.config
         return json.dumps(state)
