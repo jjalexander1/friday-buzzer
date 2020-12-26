@@ -31,6 +31,15 @@ room_manager = RoomManager()
 #                       {'data': 'Server generated event', 'count': count},
 #                       namespace='/test')
 
+
+@app.before_request
+def before_request():  # force to use https
+    if request.url.startswith('http://'):
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
+
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     global room_manager
