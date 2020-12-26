@@ -31,7 +31,7 @@ room_manager = RoomManager()
 #                       {'data': 'Server generated event', 'count': count},
 #                       namespace='/test')
 
-@app.route('/.well-known/acme-challenge/G-IjnP6nkKyruV0ICr9XqgXo2iZudHKFgdlBLlJxLQk', methods=['GET'])
+@app.route('.well-known/acme-challenge/G-IjnP6nkKyruV0ICr9XqgXo2iZudHKFgdlBLlJxLQk', methods=['GET'])
 def certbot_challenge():
     challenge = "G-IjnP6nkKyruV0ICr9XqgXo2iZudHKFgdlBLlJxLQk.JabBki4urMYhvZmoPDyvMsHDgKKpPBVS1_FDOgYG2N4"
     return challenge
