@@ -59,6 +59,7 @@ def home():
 
 @app.route('/room/<room_id>', methods=["GET", "POST"])
 def room(room_id):
+    room_id = room_id.lower()  # make case insensitive
     participant_name = request.args.get('participant_name')
     global BAD_CHARS
     if not participant_name:  # force players to go through the homepage, don't bother erroring
