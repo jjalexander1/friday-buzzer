@@ -65,7 +65,7 @@ def home():
     form = ParticipantNameForm(request.form)
     if request.method == 'POST':
         return redirect(url_for("room", participant_name=form.participant_name.data, room_id=form.room_id.data))
-    return render_template("home.html", form=form, busiest_rooms=busiest_rooms)
+    return render_template("home.html", form=form)  # temporarily removed busiest_rooms=busiest_rooms from return
 
 
 @app.route('/room/<room_id>', methods=["GET", "POST"])
