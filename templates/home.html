@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='scrolling_animation.css') }}">
+    </head>
+  <body>
+	<div class="wrapper" style="background: url('{{ url_for('static',filename='images/stars.jpeg') }}'), #111111;">
+        <div>
+          <h1 class="title" id="typed_banner1"></h1><br><br>
+            <h4 class="title" id="typed_banner3"><a href="/music" class="nostyle"></a></h4>
+            <h4 class="title" id="typed_banner4"><a href="/buzzer" class="nostyle"></a></h4>
+        </div>
+	</div>
+  </body>
+    <script>
+      var audio = new Audio('{{ url_for('static',filename='audio/morse.mp3') }}');
+      var bannerClicked = false
+      document.getElementById("typed_banner1").addEventListener("click", function () {
+          console.log("playing");
+          audio.play()
+
+          var i = 0;
+          function typeWriter2() {
+                var txt3 = "=Redeemer";
+                var txt4 = "Buzzer";
+                if (i < txt3.length) {
+                  document.getElementById("typed_banner3").children[0].innerHTML += txt3.charAt(i);
+                  i++;
+                  setTimeout(typeWriter2, 100);
+                } else if (i < txt3.length + txt4.length) {
+                  document.getElementById("typed_banner4").children[0].innerHTML += txt4.charAt(i - txt3.length);
+                  i++;
+                  setTimeout(typeWriter2, 100);
+                }
+          };
+          if (!bannerClicked) {
+            typeWriter2();
+            bannerClicked = true;
+          };
+      });
+
+      var i = 0;
+      function typeWriter() {
+        var txt1 = "=Johannes";
+        var txt2 = "Created by JJA, 2021.";
+        if (i < txt1.length) {
+          document.getElementById("typed_banner1").innerHTML += txt1.charAt(i);
+          i++;
+          setTimeout(typeWriter, 100);
+        } else if (i < txt1.length + txt2.length) {
+          document.getElementById("typed_banner2").innerHTML += txt2.charAt(i - txt1.length);
+          i++;
+          setTimeout(typeWriter, 30);
+        }
+      }
+      typeWriter();
+
+
+    </script>
+{% endblock %}

@@ -1,4 +1,4 @@
-from buzzer_app.views import app, socketio
+from views import app, socketio
 
 import eventlet
 

@@ -1,14 +1,8 @@
-import time
-import re
-import json
-
 from flask import request, redirect, url_for, render_template, Flask
 from flask_socketio import emit, join_room, leave_room, SocketIO
-from threading import Thread
 
-
-from buzzer_app.backend import RoomManager, Player
-from buzzer_app.forms import ParticipantNameForm, RoomSettingsForm
+from backend import RoomManager
+from forms import ParticipantNameForm, RoomSettingsForm
 
 # TODO make ping frequency an application configuration
 
