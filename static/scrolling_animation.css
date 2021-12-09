@@ -34,21 +34,20 @@ body {
   }
 }
 
-@media (min-width: 670px) {
-  .title {
-    font-size: 5rem;
-  }
-}
 
 /* stop 'a' tags having underline and chagnging format */
 a.nostyle:link {
     text-decoration: inherit;
     color: inherit;
-    cursor: auto;
+    cursor: pointer;
 }
 
 a.nostyle:visited {
     text-decoration: inherit;
     color: inherit;
-    cursor: auto;
+    cursor: pointer;
+}
+
+a {
+    display:block;
 }

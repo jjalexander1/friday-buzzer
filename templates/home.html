@@ -7,18 +7,29 @@
   <body>
 	<div class="wrapper" style="background: url('{{ url_for('static',filename='images/stars.jpeg') }}'), #111111;">
         <div>
-          <h1 class="title" id="typed_banner1"></h1><br><br>
-            <h4 class="title" id="typed_banner3"><a href="/music" class="nostyle"></a></h4>
-            <h4 class="title" id="typed_banner4"><a href="/buzzer" class="nostyle"></a></h4>
+            <div id="banner1_wrapper">
+                <h1 class="title" id="typed_banner1"></h1><br>
+            </div>
+            <div id="banner3_wrapper">
+                <br>
+                <p class="title" id="typed_banner3"><a href="/music" class="nostyle"></a></p>
+                <br>
+            </div>
+            <div id="banner4_wrapper">
+                <br>
+                <p class="title" id="typed_banner4"><a href="/buzzer" class="nostyle"></a></p>
+            </div>
+
         </div>
 	</div>
   </body>
     <script>
       var audio = new Audio('{{ url_for('static',filename='audio/morse.mp3') }}');
       var bannerClicked = false
-      document.getElementById("typed_banner1").addEventListener("click", function () {
-          console.log("playing");
-          audio.play()
+      document.getElementById("banner1_wrapper").addEventListener("click", function () {
+          if (!bannerClicked) {
+              audio.play()
+          }
 
           var i = 0;
           function typeWriter2() {
@@ -56,6 +67,26 @@
       }
       typeWriter();
 
+      document.getElementById("banner1_wrapper").addEventListener("mouseover", function () {
+        document.getElementById("typed_banner1").style.color = "#E7E943";  // yellow
+        document.getElementById("typed_banner1").style.cursor = "pointer";
+      });
+      document.getElementById("banner1_wrapper").addEventListener("mouseout", function () {
+        document.getElementById("typed_banner1").style.color = "white";
+        document.getElementById("typed_banner1").style.cursor = "default";
+      });
+      document.getElementById("banner3_wrapper").addEventListener("mouseover", function () {
+        document.getElementById("typed_banner3").style.color = "#5CDA33";  // green
+      });
+      document.getElementById("banner3_wrapper").addEventListener("mouseout", function () {
+        document.getElementById("typed_banner3").style.color = "white";
+      });
+      document.getElementById("banner4_wrapper").addEventListener("mouseover", function () {
+        document.getElementById("typed_banner4").style.color = "#EE3232";  // red
+      });
+      document.getElementById("banner4_wrapper").addEventListener("mouseout", function () {
+        document.getElementById("typed_banner4").style.color = "white";
+      });
 
     </script>
 {% endblock %}

@@ -1,0 +1,7 @@
+Using gunicorn server with daemon flag and eventlet workers
+gunicorn --worker-class eventlet -w 1 run:app --daemon
+
+to play around with the nginx reverse proxy on the server use systemctl.
+The configuration file can be found in /etc/nginx/sites-available/friday-buzzer
+followed this for installing nginx https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04
+and used the configuration file from https://flask-socketio.readthedocs.io/en/latest/deployment.html
