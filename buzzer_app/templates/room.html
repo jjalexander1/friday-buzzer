@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='static_bg_color.css') }}">
+</head>
 {% include 'navbar.html' %}
 <div class="header-box-outer">
   <div class="header-box-inner text-center">
@@ -136,7 +139,7 @@
 $(document).ready(function () {
     var buzzes = [];
     var locked_out_players = [];
-    var audio = new Audio('{{ url_for('static',filename='audio/buzz.mp3') }}');
+    var audio = new Audio('{{ url_for('static',filename='audio/soft_beep.mp3') }}');
 
     // functions to update page js, called by socket server update handlers
     function updateBuzzLog(current_buzzes) {

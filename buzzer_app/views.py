@@ -49,10 +49,8 @@ def before_request():  # force to use https
         code = 301
         return redirect(url, code=code)
 
-
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    print('hi')
     global room_manager
     busiest_rooms = room_manager.get_busiest_rooms()
 
@@ -67,8 +65,24 @@ def home():
         return redirect(url_for("room", participant_name=form.participant_name.data, room_id=form.room_id.data))
     return render_template("home.html", form=form)  # temporarily removed busiest_rooms=busiest_rooms from return
 
+@app.route('/buzzer', methods=['GET', 'POST'])
+def buzzer_home():
+    global room_manager
+    busiest_rooms = room_manager.get_busiest_rooms()
 
-@app.route('/room/<room_id>', methods=["GET", "POST"])
+    # global thread
+    # if thread is None:
+    #     thread = Thread(target=background_thread)
+    #     thread.daemon = True
+    #     thread.start()
+
+    form = ParticipantNameForm(request.form)
+    if request.method == 'POST':
+        return redirect(url_for("room", participant_name=form.participant_name.data, room_id=form.room_id.data))
+    return render_template("buzzer_home.html", form=form)  # temporarily removed busiest_rooms=busiest_rooms from return
+
+
+@app.route('/buzzer/room/<room_id>', methods=["GET", "POST"])
 def room(room_id):
     room_id = room_id.lower()  # make case insensitive
     participant_name = request.args.get('participant_name')

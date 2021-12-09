@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='changing_bg_color.css') }}">
+</head>
+{% include 'navbar.html'%}
+    <header class="jumbotron text-center" style="padding-top: 8rem">
+      <div class="container">
+        <h1 style="font-family:copperplate;" id="typed_banner1"></h1>
+          <form method="post">
+            <div class="form-group">
+              <label for="ParticipantNameInput">Participant Name</label>
+              <input type="text" class="form-control" id="ParticipantNameInput" aria-describedby="nameHelp" placeholder="Enter the name you want to appear as" name="participant_name">
+            </div>
+            <div class="form-group">
+              <label for="RoomIDInput">Room</label>
+              <input type="text" class="form-control" id="RoomIDInput" aria-describedby="IDHelp" placeholder="Room name (type anything to create a new room)" name="room_id">
+              {% if busiest_rooms %}
+                <br>
+                Busy rooms include
+                {% for room in busiest_rooms %}
+                  <u><a class="busy-room-link">{{ room }}</a></u>
+                {% endfor %}
+              {% endif %}
+              </small>
+            </div>
+            <button id="enter_room" type="submit" class="btn btn-primary" name="submit">Enter Room</button>
+        </form>
+      </div>
+    </header>
+
+    <script>
+      $('.busy-room-link').on('click', function() {
+        $('#RoomIDInput').val(this.text)
+      });
+
+      var i = 0;
+      function typeWriter() {
+        var txt1 = "Quiz Buzzer";
+        var txt2 = "Created by JJA, 2021.";
+        if (i < txt1.length) {
+          document.getElementById("typed_banner1").innerHTML += txt1.charAt(i);
+          i++;
+          setTimeout(typeWriter, 100);
+        } else if (i < txt1.length + txt2.length) {
+          document.getElementById("typed_banner2").innerHTML += txt2.charAt(i - txt1.length);
+          i++;
+          setTimeout(typeWriter, 60);
+        }
+      }
+      typeWriter();
+
+
+    </script>
+{% endblock %}

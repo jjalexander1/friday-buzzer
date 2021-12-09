@@ -4,12 +4,12 @@ from wtforms.fields import StringField, IntegerField, SelectField
 
 class ParticipantNameForm(FlaskForm):
     participant_name = StringField("Participant Name")
-    room_id = StringField("Room ID")
+    room_id = StringField("Room")
 
 
 class RoomSettingsForm(FlaskForm):
     participant_name = StringField("Participant Name")
-    room_id = StringField("Room ID")
+    room_id = StringField("Room")
     correct_points = IntegerField("Correct Points")
     early_incorrect_points = IntegerField("Early Incorrect Points")
     time_evaluation_method = SelectField("Early Incorrect Points",
