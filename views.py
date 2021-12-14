@@ -28,7 +28,7 @@ LOCALHOST_URL_IDENTIFIERS = ['//localhost',
 #                       {'data': 'Server generated event', 'count': count},
 #                       namespace='/test')
 
-
+"""  commented out until I have an ssl cert
 @app.before_request
 def before_request():  # force to use https
     for l in LOCALHOST_URL_IDENTIFIERS:
@@ -42,22 +42,16 @@ def before_request():  # force to use https
         url = request.url.replace('http://', 'https://', 1)
         code = 301
         return redirect(url, code=code)
+"""
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    global room_manager
-    busiest_rooms = room_manager.get_busiest_rooms()
+    return render_template("home.html")
 
-    # global thread
-    # if thread is None:
-    #     thread = Thread(target=background_thread)
-    #     thread.daemon = True
-    #     thread.start()
 
-    form = ParticipantNameForm(request.form)
-    if request.method == 'POST':
-        return redirect(url_for("room", participant_name=form.participant_name.data, room_id=form.room_id.data))
-    return render_template("home.html", form=form)  # temporarily removed busiest_rooms=busiest_rooms from return
+@app.route('/music', methods=['GET', 'POST'])
+def redeemer():
+    return render_template("redeemer.html")
 
 @app.route('/buzzer', methods=['GET', 'POST'])
 def buzzer_home():

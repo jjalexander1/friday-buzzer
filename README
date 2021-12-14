@@ -1,7 +1,28 @@
 Using gunicorn server with daemon flag and eventlet workers
-gunicorn --worker-class eventlet -w 1 run:app --daemon
 
-to play around with the nginx reverse proxy on the server use systemctl.
-The configuration file can be found in /etc/nginx/sites-available/friday-buzzer
-followed this for installing nginx https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04
-and used the configuration file from https://flask-socketio.readthedocs.io/en/latest/deployment.html
+`cd ~/friday-buzzer`
+`gunicorn --worker-class eventlet -w 1 run:app --daemon`
+
+Note that 'run' is the name of the file that contains the Flask app instance,
+and app is the name of that instance. Note that the if __name__ == '__main__'
+lines in the entrypoint are effectively ignored by gunicorn, they're only invoked
+when you're locally running the dev server. gunicorn uses port 8000 (which we have
+specified in the nginx config file, and arbitrarily the dev server uses 5000
+as specified in the entrypoint file.
+
+To play around with the nginx reverse proxy on the server use systemctl.
+
+The nginx configuration file can be found in /etc/nginx/sites-available/friday-buzzer
+I followed this for installing nginx https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04
+I used the nginx configuration file from https://flask-socketio.readthedocs.io/en/latest/deployment.html
+
+To release, on your local machine use git to stage the changes, commit them, push them to master. Then ssh
+into the ec2 machine and run
+
+`ssh ubuntu@3.8.174.253 -i ~/.ssh/id_rsa_jja_aws.cer`
+`cd friday-buzzer`
+`git pull`
+
+and there the server will have the latest version of the code. You'll need to restart gunicorn
+to pick up the new code, I think. The flask development server does this automatically
+which is why you don't need to do that when testing locally.

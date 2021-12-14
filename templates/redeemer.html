@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block body %}
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='changing_bg_color.css') }}">
+    <style>
+
+.title {
+  font-family: 'Copperplate', cursive;
+  text-align: center;
+}
+
+.wrapper {
+  height: 100%;
+  min-width: 360px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+  perspective-origin: 50% 50%;
+
+}
+    </style>
+
+</head>
+{% include 'navbar.html'%}
+<body>
+    <div class="wrapper">
+        <h1 class="title">
+            Coming Soon.
+        </h1>
+    </div>
+</body>
+<script>
+
+  var i = 0;
+  function typeWriter() {
+    var txt1 = "=Redeemer";
+    var txt2 = "Created by JJA, 2021.";
+    if (i < txt1.length) {
+      document.getElementById("typed_banner1").innerHTML += txt1.charAt(i);
+      i++;
+      setTimeout(typeWriter, 100);
+    } else if (i < txt1.length + txt2.length) {
+      document.getElementById("typed_banner2").innerHTML += txt2.charAt(i - txt1.length);
+      i++;
+      setTimeout(typeWriter, 60);
+    }
+  }
+  typeWriter();
+
+
+</script>
+{% endblock %}
