@@ -6,7 +6,7 @@
 {% include 'navbar.html'%}
     <header class="jumbotron text-center" style="padding-top: 8rem">
       <div class="container">
-        <h1 style="font-family:copperplate;" id="typed_banner1"></h1>
+        <h1 style="font-family:copperplate;">Quiz Buzzer</h1>
           <form method="post">
             <div class="form-group">
               <label for="ParticipantNameInput">Participant Name</label>
@@ -33,22 +33,6 @@
       $('.busy-room-link').on('click', function() {
         $('#RoomIDInput').val(this.text)
       });
-
-      var i = 0;
-      function typeWriter() {
-        var txt1 = "Quiz Buzzer";
-        var txt2 = "Created by JJA, 2021.";
-        if (i < txt1.length) {
-          document.getElementById("typed_banner1").innerHTML += txt1.charAt(i);
-          i++;
-          setTimeout(typeWriter, 100);
-        } else if (i < txt1.length + txt2.length) {
-          document.getElementById("typed_banner2").innerHTML += txt2.charAt(i - txt1.length);
-          i++;
-          setTimeout(typeWriter, 60);
-        }
-      }
-      typeWriter();
 
 
     </script>

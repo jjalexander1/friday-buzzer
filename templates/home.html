@@ -7,8 +7,9 @@
   <body>
 	<div class="wrapper" style="background: url('{{ url_for('static',filename='images/stars.jpeg') }}'), #111111;">
         <div>
-            <div id="banner1_wrapper">
-                <h1 class="title" id="typed_banner1"></h1><br>
+            <div id="banner_wrapper_title">
+                <h1 class="title" id="typed_banner_title"></h1><br>
+                <h3 class="title" id="typed_banner_subtitle"></h3><br>
             </div>
             <div id="banner3_wrapper">
                 <br>
@@ -26,7 +27,7 @@
     <script>
       var audio = new Audio('{{ url_for('static',filename='audio/morse.mp3') }}');
       var bannerClicked = false
-      document.getElementById("banner1_wrapper").addEventListener("click", function () {
+      document.getElementById("banner_wrapper_title").addEventListener("click", function () {
           if (!bannerClicked) {
               audio.play()
           }
@@ -53,27 +54,32 @@
 
       var i = 0;
       function typeWriter() {
-        var txt1 = "=Johannes";
-        var txt2 = "Created by JJA, 2021.";
-        if (i < txt1.length) {
-          document.getElementById("typed_banner1").innerHTML += txt1.charAt(i);
+        var txt_title = "=Johannes";
+        var txt_subtitle = "Developer, Quizzer, Musician.";
+        var txt_footer = "Created by JJA, 2021.";
+        if (i < txt_title.length) {
+          document.getElementById("typed_banner_title").innerHTML += txt_title.charAt(i);
           i++;
           setTimeout(typeWriter, 100);
-        } else if (i < txt1.length + txt2.length) {
-          document.getElementById("typed_banner2").innerHTML += txt2.charAt(i - txt1.length);
+        } else if (i < txt_title.length + txt_subtitle.length) {
+          document.getElementById("typed_banner_subtitle").innerHTML += txt_subtitle.charAt(i - txt_title.length);
           i++;
-          setTimeout(typeWriter, 30);
+          setTimeout(typeWriter, 15);
+        } else if (i < txt_title.length + txt_subtitle.length + txt_footer.length) {
+          document.getElementById("typed_banner_footer").innerHTML += txt_footer.charAt(i - txt_title.length - txt_subtitle.length);
+          i++;
+          setTimeout(typeWriter, 15);
         }
       }
       typeWriter();
 
-      document.getElementById("banner1_wrapper").addEventListener("mouseover", function () {
-        document.getElementById("typed_banner1").style.color = "#E7E943";  // yellow
-        document.getElementById("typed_banner1").style.cursor = "pointer";
+      document.getElementById("banner_wrapper_title").addEventListener("mouseover", function () {
+        document.getElementById("typed_banner_title").style.color = "#E7E943";  // yellow
+        document.getElementById("typed_banner_title").style.cursor = "pointer";
       });
-      document.getElementById("banner1_wrapper").addEventListener("mouseout", function () {
-        document.getElementById("typed_banner1").style.color = "white";
-        document.getElementById("typed_banner1").style.cursor = "default";
+      document.getElementById("banner_wrapper_title").addEventListener("mouseout", function () {
+        document.getElementById("typed_banner_title").style.color = "white";
+        document.getElementById("typed_banner_title").style.cursor = "default";
       });
       document.getElementById("banner3_wrapper").addEventListener("mouseover", function () {
         document.getElementById("typed_banner3").style.color = "#5CDA33";  // green
