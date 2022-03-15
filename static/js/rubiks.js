@@ -18,9 +18,15 @@ function printTitle() {
     var width = 196;
     var height = 50;  // not strictly needed
     var resizeFactor = 4;
+    var resizedWidth = width*resizeFactor
+    var resizedHeight = height*resizeFactor
+    if (resizedWidth > window.innerWidth) {
+        resizedWidth = 0.9 * window.innerWidth
+        resizedHeight = 0.9 * resizedWidth * height / width
+    }
     const ctx = canvas.getContext('2d');
-    canvas.height = height*resizeFactor;
-    canvas.width = width*resizeFactor;
+    canvas.width = resizedWidth;
+    canvas.height = resizedHeight;
 
     ctx.lineWidth = 2
     var i = 0
