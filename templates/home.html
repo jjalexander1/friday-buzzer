@@ -1,98 +1,59 @@
 {% extends 'base.html' %}
 
 {% block body %}
-    <head>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='scrolling_animation.css') }}">
-    </head>
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='changing_bg_color.css') }}">
+</head>
   <body>
-	<div class="wrapper" style="background: url('{{ url_for('static',filename='images/stars.jpeg') }}'), #111111;">
-        <div>
-            <div id="banner_wrapper_title">
-                <h1 class="title" id="typed_banner_title"></h1><br>
-                <h3 class="title" id="typed_banner_subtitle"></h3><br>
+
+  <div class="outer">
+  <div class="middle">
+    <div class="inner">
+        <div class="canvasContainer">
+            <div class="contextCanvas" >
+                <div>
+                <canvas id="canvas" style="display: block; margin: 0 auto;"></canvas>
+
+                </div>
+                <div id="banner3_wrapper">
+                    <a id="typed_banner3" href="/buzzer" class="nostyle title"></a>
+                    <br>
+                </div>
+                <div id="banner4_wrapper">
+                    <a id="typed_banner4" href="/music" class="nostyle title"></a>
+                </div>
             </div>
-            <div id="banner3_wrapper">
-                <br>
-                <p class="title" id="typed_banner3"><a href="/music" class="nostyle"></a></p>
-                <br>
-            </div>
-            <div id="banner4_wrapper">
-                <br>
-                <p class="title" id="typed_banner4"><a href="/buzzer" class="nostyle"></a></p>
-            </div>
+
 
         </div>
-	</div>
+
+    </div>
+  </div>
+</div>
+
+
   </body>
+    <script src="{{ url_for('static',filename='js/rubiks.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/typewriter.js') }}"></script>
     <script>
+        console.log('thisworking');
       var audio = new Audio('{{ url_for('static',filename='audio/morse.mp3') }}');
-      var bannerClicked = false
-      document.getElementById("banner_wrapper_title").addEventListener("click", function () {
-          if (!bannerClicked) {
-              audio.play()
-          }
 
-          var i = 0;
-          function typeWriter2() {
-                var txt3 = "=Redeemer";
-                var txt4 = "Buzzer";
-                if (i < txt3.length) {
-                  document.getElementById("typed_banner3").children[0].innerHTML += txt3.charAt(i);
-                  i++;
-                  setTimeout(typeWriter2, 100);
-                } else if (i < txt3.length + txt4.length) {
-                  document.getElementById("typed_banner4").children[0].innerHTML += txt4.charAt(i - txt3.length);
-                  i++;
-                  setTimeout(typeWriter2, 100);
-                }
-          };
-          if (!bannerClicked) {
-            typeWriter2();
-            bannerClicked = true;
-          };
-      });
-
-      var i = 0;
-      function typeWriter() {
-        var txt_title = "=Johannes";
-        var txt_subtitle = "Developer, Quizzer, Musician.";
-        var txt_footer = "Created by JJA, 2021.";
-        if (i < txt_title.length) {
-          document.getElementById("typed_banner_title").innerHTML += txt_title.charAt(i);
-          i++;
-          setTimeout(typeWriter, 100);
-        } else if (i < txt_title.length + txt_subtitle.length) {
-          document.getElementById("typed_banner_subtitle").innerHTML += txt_subtitle.charAt(i - txt_title.length);
-          i++;
-          setTimeout(typeWriter, 15);
-        } else if (i < txt_title.length + txt_subtitle.length + txt_footer.length) {
-          document.getElementById("typed_banner_footer").innerHTML += txt_footer.charAt(i - txt_title.length - txt_subtitle.length);
-          i++;
-          setTimeout(typeWriter, 15);
-        }
-      }
-      typeWriter();
-
-      document.getElementById("banner_wrapper_title").addEventListener("mouseover", function () {
-        document.getElementById("typed_banner_title").style.color = "#E7E943";  // yellow
-        document.getElementById("typed_banner_title").style.cursor = "pointer";
-      });
-      document.getElementById("banner_wrapper_title").addEventListener("mouseout", function () {
-        document.getElementById("typed_banner_title").style.color = "white";
-        document.getElementById("typed_banner_title").style.cursor = "default";
-      });
       document.getElementById("banner3_wrapper").addEventListener("mouseover", function () {
-        document.getElementById("typed_banner3").style.color = "#5CDA33";  // green
+        document.getElementById("typed_banner3").style.color = "#244CD7";  // blue
       });
       document.getElementById("banner3_wrapper").addEventListener("mouseout", function () {
-        document.getElementById("typed_banner3").style.color = "white";
+        document.getElementById("typed_banner3").style.color = "black";
       });
       document.getElementById("banner4_wrapper").addEventListener("mouseover", function () {
         document.getElementById("typed_banner4").style.color = "#EE3232";  // red
       });
       document.getElementById("banner4_wrapper").addEventListener("mouseout", function () {
-        document.getElementById("typed_banner4").style.color = "white";
+        document.getElementById("typed_banner4").style.color = "black";
       });
 
+    document.addEventListener("DOMContentLoaded", function(){
+        typeWriter();
+    });
     </script>
 {% endblock %}
