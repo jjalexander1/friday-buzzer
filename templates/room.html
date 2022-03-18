@@ -4,7 +4,7 @@
 {% include 'navbar.html' %}
 <div class="header-box-outer jumbotron">
   <div class="header-box-inner text-center">
-    <h3>Playing in room <b>{{ room_id }}</b>
+    <h3>Room Code: <b>{{ room_id }}</b>
       <button id="audio_button" checked="true">
         <img src="{{ url_for('static',filename='images/audio_on_icon.svg') }}"/>
       </button>
@@ -14,6 +14,7 @@
 
 <div class="tab-content">
   <div id="buzzer" class="tab-pane fade in active">
+
     <div class="buzzer-wrapper container-fluid">
       <div>
         <button type="button" id="buzz" class="btn btn-danger btn-block">Buzz</button>
@@ -28,24 +29,12 @@
       </div>
     </div>
   </div>
-
   <div id="scoreboard" class="tab-pane fade">
-    <div class="scoreboard-wrapper container-fluid">
-      <table class="buzzer-scores-table table table-hover table-striped table-compact">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Participant</th>
-            <th scope="col">Score</th>
-            <th scope="col">Correct</th>
-            <th scope="col">Early Incorrect</th>
-            <th scope="col">Current Streak</th>
-            <th scope="col">Longest Streak</th>
-          </tr>
-        </thead>
-      </table>
+    <div class="container-fluid">
+      <div id="scoreboard2"></div>
     </div>
   </div>
+
 
   <div id="host" class="tab-pane fade">
     <div class="host-wrapper container-fluid">
@@ -135,19 +124,20 @@
 <script>
 
 $(document).ready(function () {
+
     var buzzes = [];
     var locked_out_players = [];
     var audio = new Audio('{{ url_for('static',filename='audio/soft_beep.mp3') }}');
 
     // functions to update page js, called by socket server update handlers
     function updateBuzzLog(current_buzzes) {
-      new_scoreboard_html = `
+      buzz_log_html = `
           <div class="list-group">
       `
       var pos = 1;
       for (buzz of current_buzzes) {
         if (pos == 1) {
-          new_scoreboard_html += `<button type="button" class="list-group-item list-group-item-success d-flex justify-content-between align-items-center"><b>` + buzz.name + `</b></button>`
+          buzz_log_html += `<button type="button" class="list-group-item list-group-item-success d-flex justify-content-between align-items-center"><b>` + buzz.name + `</b></button>`
         } else {
            secondsTimeDiffFromFirstFloat = buzz.time - current_buzzes[0].time
            if (secondsTimeDiffFromFirstFloat >= 5) {
@@ -155,44 +145,58 @@ $(document).ready(function () {
            } else {
               timeDiff = Math.round(secondsTimeDiffFromFirstFloat * 1000) + 'ms'
            }
-           new_scoreboard_html += `<button type="button" class="list-group-item d-flex justify-content-between align-items-center">` + buzz.name + `<span class="badge badge-primary badge-pill">+` + timeDiff + `</span></button>`
+           buzz_log_html += `<button type="button" class="list-group-item d-flex justify-content-between align-items-center">` + buzz.name + `<span class="badge badge-primary badge-pill">+` + timeDiff + `</span></button>`
         };
 
-        //if (pos == 5) {  // TODO this is current decoupled -- maybe add this to the page settings!
-        //   break;
-        //}
         pos += 1
       }
-      new_scoreboard_html += "</div>"
+      buzz_log_html += "</div>"
 
-      $(".buzz-log").html(new_scoreboard_html)
+      $(".buzz-log").html(buzz_log_html)
     }
+    //define some sample data
+     var tabledata = [];
+
+    //create Tabulator on DOM element with id "example-table"
+    var table = new Tabulator("#scoreboard2", {
+        data:tabledata,
+        // responsiveLayout:"collapse",
+        layout:"fitColumns",      //fit columns to width of table
+        responsiveLayout:true,  //hide columns that dont fit on the table
+        pagination:"local",
+        paginationSize:10,
+        paginationCounter:"rows",
+        columns:[
+            {title:"#", field:"pos", width:50, headerHozAlign:"center"},
+            {title:"Player", field:"player", hozAlign:"center", headerHozAlign:"center"},
+            {title:"Score", field:"score", hozAlign:"center", headerHozAlign:"center"},
+            {title:"Correct", field:"correct", hozAlign:"center", headerHozAlign:"center"},
+            {title:"Early", field:"early", hozAlign:"center", headerHozAlign:"center"},
+            {title:"Streak", field:"streak", hozAlign:"center", headerHozAlign:"center"},
+            {title:"Longest", field:"longest", hozAlign:"center", headerHozAlign:"center"},
+        ],
+    });
+
     function updateScoreboard(player_scores) {
-      new_scoreboard_html = `
-      <table class="buzzer-scores-table table table-dark">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Participant</th>
-          <th scope="col">Score</th>
-          <th scope="col">Correct</th>
-          <th scope="col">Early Incorrect</th>
-          <th scope="col">Current Streak</th>
-          <th scope="col">Longest Streak</th>
-        </tr>
-      </thead>
-      <tbody>
-      `
-      var pos = 1;
+      var newTableData = [];
+      var idCounter = 1;
       for (player of player_scores) {
-        new_scoreboard_html += `<tr><th scope="row">` + pos + `</th><td>` + player.name + `</td><td>` + player.score + `</td><td>` + player.correct_answers + `</td><td>` + player.early_incorrect_answers + `</td><td>` + player.current_streak + `</td><td>` + player.longest_streak + `</td></tr>`
-        pos += 1
+        var newRow = {
+          id: idCounter,
+          pos: idCounter,
+          player: player.name,
+          score: player.score,
+          correct: player.correct_answers,
+          early: player.early_incorrect_answers,
+          streak: player.current_streak,
+          longest: player.longest_streak
+        }
+        newTableData.push(newRow);
+        idCounter += 1
       }
-      new_scoreboard_html += "</tbody></table>"
-
-      $(".buzzer-scores-table").html(new_scoreboard_html)
+      table.clearData();
+      table.addData(newTableData);
     }
-
     function nameInCurrentBuzzes(participant_name, current_buzzes) {
         for (element of current_buzzes) {
             if (element.name == participant_name) {
@@ -238,6 +242,13 @@ $(document).ready(function () {
       $("#sortLatencyInput").val(config.sort_latency)
     };
 
+    function alertServerMaintenance(should) {
+      if (should) {
+        var x = document.getElementById("snackbar");
+        x.className = "showSnackbar";
+        setTimeout(function(){ x.className = x.className.replace("showSnackbar", ""); }, 30000);
+      }
+    };
     // create socket connection when you join a room on the server
     namespace = '/friday_buzzer';
     var socket = io(location.protocol + '//' + document.domain + ':' + location.port + namespace);
@@ -324,6 +335,7 @@ $(document).ready(function () {
       updateScoreboard(payload.scoreboard);
       updateBuzzerColour(payload.current_buzzes, payload.locked_out_players);
       updateSettings(payload.config);
+      alertServerMaintenance(payload.server_maintenance_alert);
     });
 
 
@@ -353,6 +365,8 @@ $(document).ready(function () {
     window.setInterval(function(){
           ping();
     }, 20000);  // once every 20 seconds for now
+
+
 });
 </script>
 {% endblock %}

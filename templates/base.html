@@ -6,11 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="description" content="Buzzer Quiz Application"/>
     <meta name="author" content="Jack Johannes Alexander"/>
-    <title>Buzzer</title>
+    <title>==Johannes</title>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.1.1/gh-fork-ribbon.min.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <link href="https://unpkg.com/tabulator-tables@5.1.7/dist/css/tabulator.min.css" rel="stylesheet">
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
     <link rel="icon" href="{{ url_for('static',filename='images/favicon.png') }}">
@@ -18,13 +20,16 @@
   <body>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.1.7/dist/js/tabulator.min.js"></script>
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
 
     {% block body %}{% endblock %}
 
+    <div id="snackbar">Server restarting for maintenance in 5 minutes. Please save your scores as things will be deleted!</div>
     <footer class="footer navbar-fixed-bottom w-100">
       <div class="container-fluid text-center small-dark-footer">
-        <span class="text-muted" id="typed_banner_footer"></span>
+        <span class="text-muted" id="typed_banner_footer">Created by JJA, 2022.</span>
       </div>
     </footer>
   </body>

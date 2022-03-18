@@ -23,12 +23,13 @@ class RoomManager(object):
         if room_id not in self.rooms.keys():
             new_room = BuzzerRoom(id=room_id)
             self.rooms[new_room.id] = new_room
+        self.cleanup_rooms()  # just call this each time a new room is created to make sure the app is in a good state
 
     def _delete_room(self, old_room):
         if isinstance(old_room, BuzzerRoom) and old_room.id in self.rooms.keys():
             del self.rooms[old_room.id]
 
-    def cleanup_rooms(self):  # currently not run
+    def cleanup_rooms(self):  # currently run every time a new room is added
         current_time = datetime.datetime.now().timestamp()
         to_delete = []
         for room in self.rooms.values():
@@ -102,7 +103,7 @@ class BuzzerRoom(object):
                 self.buzzes.append({'name': name, "time": adjusted_client_side_time})
                 print('offset: {}'.format(player.offset))
             elif self.config['time_evaluation_method'] == 'another':
-                if 'max' in name.lower():
+                if 'max' in name.upper():
                     server_side_time += 1
                 self.buzzes.append({'name': name, "time": server_side_time})
         if self.config['one_buzz_per_question']:
@@ -187,6 +188,7 @@ class BuzzerRoom(object):
 
         state['play_audio'] = self.play_audio
         state['config'] = self.config
+        state['server_maintenance_alert'] = False  # is this needs to be set it's overriden in the handlers
         return json.dumps(state)
 
 

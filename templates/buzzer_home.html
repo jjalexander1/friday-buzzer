@@ -9,12 +9,12 @@
         <h1 style="font-family:copperplate;">Quiz Buzzer</h1>
           <form method="post">
             <div class="form-group">
-              <label for="ParticipantNameInput">Participant Name</label>
+              <label for="ParticipantNameInput">Player Name</label>
               <input type="text" class="form-control" id="ParticipantNameInput" aria-describedby="nameHelp" placeholder="Enter the name you want to appear as" name="participant_name">
             </div>
             <div class="form-group">
-              <label for="RoomIDInput">Room</label>
-              <input type="text" class="form-control" id="RoomIDInput" aria-describedby="IDHelp" placeholder="Room name (type anything to create a new room)" name="room_id">
+              <label for="RoomIDInput">Room Code</label>
+              <input type="text" class="form-control" id="RoomIDInput" aria-describedby="IDHelp" placeholder="Room Code (type anything to create a new room)" name="room_id">
               {% if busiest_rooms %}
                 <br>
                 Busy rooms include
