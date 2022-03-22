@@ -1,4 +1,4 @@
-from views import app, socketio
+from app import app, socketio
 
 import eventlet
 
@@ -6,7 +6,6 @@ eventlet.monkey_patch()
 # from gevent import monkey
 #
 # monkey.patch_all()
-
 socketio.init_app(app)
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
 
-{% include 'navbar.html' %}
+{% include 'buzzer_navbar.html' %}
 <div class="header-box-outer jumbotron">
   <div class="header-box-inner text-center">
     <h3>Room Code: <b>{{ room_id }}</b>
@@ -280,6 +280,7 @@ $(document).ready(function () {
               return;
           }
       }
+      console.log('emitting buzz');
       socket.emit("buzz", {"participant_name": '{{ participant_name }}',
                            "room_id": '{{ room_id }}',
                            "buzz_time": time})

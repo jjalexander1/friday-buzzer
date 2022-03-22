@@ -6,7 +6,8 @@ Using gunicorn server with daemon flag and eventlet workers
 Note that 'run' is the name of the file that contains the Flask app instance,
 and app is the name of that instance. Note that the if __name__ == '__main__'
 lines in the entrypoint are effectively ignored by gunicorn, they're only invoked
-when you're locally running the dev server. gunicorn uses port 8000 (which we have
+when you're locally
+ running the dev server. gunicorn uses port 8000 (which we have
 specified in the nginx config file, and arbitrarily the dev server uses 5000
 as specified in the entrypoint file.
 
@@ -26,3 +27,10 @@ into the ec2 machine and run
 and there the server will have the latest version of the code. You'll need to restart gunicorn
 to pick up the new code, I think. The flask development server does this automatically
 which is why you don't need to do that when testing locally.
+
+
+To create db, go in your venv and run the following (using this https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database)
+
+flask db init
+flask db migrate -m "users table"
+flask db upgrade
