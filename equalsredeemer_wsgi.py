@@ -10,15 +10,10 @@ if project_home not in sys.path:
 # Tell Flask to use the production configuration
 os.environ['FLASK_ENV'] = 'production'
 
-from app import app, socketio
+from flask_app import app
 
 
-socketio.init_app(app)
 
-# Example of handling Socket.IO events (you should define your own handlers)
-@socketio.on('message')
-def handle_message(message):
-    print('received message: ' + message)
 
 # For production, the Flask-SocketIO server should be run using Socket.IO's WSGI support
 if __name__ == '__main__':

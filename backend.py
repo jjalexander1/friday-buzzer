@@ -23,7 +23,7 @@ class RoomManager(object):
         if room_id not in self.rooms.keys():
             new_room = BuzzerRoom(id=room_id)
             self.rooms[new_room.id] = new_room
-        self.cleanup_rooms()  # just call this each time a new room is created to make sure the app is in a good state
+        self.cleanup_rooms()  # just call this each time a new room is created to make sure the flask_app is in a good state
 
     def _delete_room(self, old_room):
         if isinstance(old_room, BuzzerRoom) and old_room.id in self.rooms.keys():

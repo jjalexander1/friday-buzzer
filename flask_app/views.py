@@ -2,10 +2,10 @@ from flask import request, redirect, url_for, render_template, Flask, flash
 from flask_socketio import emit, join_room, leave_room, SocketIO
 import json
 from backend import RoomManager
-from app.forms import ParticipantNameForm, RoomSettingsForm
+from flask_app.forms import ParticipantNameForm, RoomSettingsForm
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
-from app.models import User
-from app import app, socketio, namespace, room_manager, models, forms
+from flask_app.models import User
+from flask_app import app, socketio, namespace, room_manager, models, forms
 import datetime
 
 # TODO make ping frequency an application configuration
@@ -26,7 +26,7 @@ LOCALHOST_URL_IDENTIFIERS = ['//localhost',
 #                       namespace='/test')
 
 """  commented out until I have an ssl cert
-@app.before_request
+@flask_app.before_request
 def before_request():  # force to use https
     for l in LOCALHOST_URL_IDENTIFIERS:
         if l in request.url:
