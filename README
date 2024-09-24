@@ -1,36 +1,78 @@
-Using gunicorn server with daemon flag and eventlet workers
 
-`cd ~/friday-buzzer`
-`gunicorn --worker-class eventlet -w 1 run:app --daemon`
+# Friday Buzzer Server Setup
 
-Note that 'run' is the name of the file that contains the Flask app instance,
-and app is the name of that instance. Note that the if __name__ == '__main__'
-lines in the entrypoint are effectively ignored by gunicorn, they're only invoked
-when you're locally
- running the dev server. gunicorn uses port 8000 (which we have
-specified in the nginx config file, and arbitrarily the dev server uses 5000
-as specified in the entrypoint file.
+This guide will walk you through setting up the server with `gunicorn` and using `nginx` as a reverse proxy.
 
-To play around with the nginx reverse proxy on the server use systemctl.
+## Running the Flask App with Gunicorn
 
-The nginx configuration file can be found in /etc/nginx/sites-available/friday-buzzer
-I followed this for installing nginx https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04
-I used the nginx configuration file from https://flask-socketio.readthedocs.io/en/latest/deployment.html
+To start the Flask app using `gunicorn` with `eventlet` workers and run it as a daemon, follow these steps:
 
-To release, on your local machine use git to stage the changes, commit them, push them to master. Then ssh
-into the ec2 machine and run
+```bash
+cd ~/friday-buzzer
+gunicorn --worker-class eventlet -w 1 run:app --daemon
+```
 
-`ssh ubuntu@3.8.174.253 -i ~/.ssh/id_rsa_jja_aws.cer`
-`cd friday-buzzer`
-`git pull`
+### Important Notes:
+- `run` is the name of the file that contains the Flask app instance.
+- `app` is the name of the Flask app instance.
+- The `if __name__ == '__main__'` block in the entry point file is ignored by `gunicorn` and is only used when running the development server locally.
+- `gunicorn` listens on port 8000 (configured in the `nginx` config file).
+- The Flask development server uses port 5000 as specified in the entry point file.
 
-and there the server will have the latest version of the code. You'll need to restart gunicorn
-to pick up the new code, I think. The flask development server does this automatically
-which is why you don't need to do that when testing locally.
+## Nginx Setup
 
+To play around with the `nginx` reverse proxy on the server, use `systemctl` commands. The `nginx` configuration file is located at:
 
-To create db, go in your venv and run the following (using this https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database)
+```
+/etc/nginx/sites-available/friday-buzzer
+```
 
-flask db init
-flask db migrate -m "users table"
-flask db upgrade
+### Useful References:
+- [DigitalOcean: How to Install Nginx on Ubuntu 20.04](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04)
+- [Flask-SocketIO Deployment Guide](https://flask-socketio.readthedocs.io/en/latest/deployment.html)
+
+## Deploying New Code
+
+To deploy new code to the server, follow these steps:
+
+1. On your local machine:
+    ```bash
+    git add .
+    git commit -m "Your commit message"
+    git push origin master
+    ```
+
+2. SSH into the EC2 instance:
+    ```bash
+    ssh ubuntu@3.8.174.253 -i ~/.ssh/id_rsa_jja_aws.cer
+    cd ~/friday-buzzer
+    git pull
+    ```
+
+3. Restart `gunicorn` to apply the new code changes:
+    ```bash
+    sudo systemctl restart gunicorn
+    ```
+
+_Note: The Flask development server automatically reloads on code changes, but `gunicorn` needs to be restarted manually in production._
+
+## Database Setup
+
+To set up the database, activate your virtual environment and run the following commands:
+
+1. Initialize the database:
+    ```bash
+    flask db init
+    ```
+
+2. Create a migration:
+    ```bash
+    flask db migrate -m "users table"
+    ```
+
+3. Apply the migration:
+    ```bash
+    flask db upgrade
+    ```
+
+Refer to [Miguel Grinberg's Flask Mega Tutorial: Database Setup](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iv-database) for more details.
