@@ -4,9 +4,10 @@
 {% include 'buzzer_navbar.html' %}
 <div class="header-box-outer jumbotron">
   <div class="header-box-inner text-center">
-    <h3>Room Code: <b>{{ room_id }}</b>
-      <button id="audio_button" checked="true">
-        <img src="{{ url_for('static',filename='images/audio_on_icon.svg') }}"/>
+    <h3>
+      Room Code: <b>{{ room_id }}</b>
+      <button id="audio_button" class="btn btn-sm btn-light ml-2 p-1" checked="true">
+        <img src="{{ url_for('static',filename='images/audio_on_icon.svg') }}" alt="Audio On Icon"/>
       </button>
     </h3>
   </div>
@@ -14,92 +15,89 @@
 
 <div class="tab-content">
   <div id="buzzer" class="tab-pane fade in active">
-
     <div class="buzzer-wrapper container-fluid">
-      <div>
-        <button type="button" id="buzz" class="btn btn-danger btn-block">Buzz</button>
+      <div class="mb-4">
+        <button type="button" id="buzz" class="btn btn-danger btn-block btn-lg">Buzz</button>
       </div>
-      <div>
-      <div class="container-fluid text-center" style="padding-top: 15px;">
+      <div class="text-center mb-3">
         Quickest buzzes will appear below
       </div>
-        <div class="buzz-log">
-            <div class="list-group"></div>
-        </div>
+      <div class="buzz-log">
+        <div class="list-group"></div>
       </div>
     </div>
   </div>
+
   <div id="scoreboard" class="tab-pane fade">
-    <div class="container-fluid">
+    <div class="container-fluid py-3">
       <div id="scoreboard2"></div>
     </div>
   </div>
 
-
   <div id="host" class="tab-pane fade">
-    <div class="host-wrapper container-fluid">
-      <div>
-        <div class="host-button-wrapper">
-          <button type="button" id="correct" class="btn btn-success btn-block host-button"><b>Correct</b></button>
+    <div class="host-wrapper container-fluid py-3">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <button type="button" id="correct" class="btn btn-success btn-block btn-lg"><b>Correct</b></button>
         </div>
-        <div class="host-button-wrapper">
-          <button type="button" id="standard_incorrect"  class="btn btn-warning btn-block host-button"><b>Standard Incorrect</b></button>
+        <div class="col-md-6 mb-3">
+          <button type="button" id="reset_buzzer" class="btn btn-light btn-block btn-lg">Reset</button>
         </div>
-        <div class="host-button-wrapper">
-          <button type="button" id="early_incorrect"  class="btn btn-danger btn-block host-button"><b>Early Incorrect</b></button>
+        <div class="col-md-6 mb-3">
+          <button type="button" id="standard_incorrect" class="btn btn-warning btn-block btn-lg"><b>Standard Incorrect</b></button>
         </div>
-        <div class="host-button-wrapper">
-          <button type="button" id="reset_buzzer" class="btn btn-light btn-block host-button">Reset</button>
+        <div class="col-md-6 mb-3">
+          <button type="button" id="early_incorrect" class="btn btn-danger btn-block btn-lg"><b>Early Incorrect</b></button>
         </div>
       </div>
-      <div>
-        <div class="buzz-log">
-            <div class="list-group"></div>
-        </div>
+      <h4 class="mt-3">Current Buzz Log</h4>
+      <div class="buzz-log">
+        <div class="list-group"></div>
       </div>
     </div>
   </div>
 
   <div id="settings" class="tab-pane fade">
-    <div class="settings-wrapper container-fluid">
-      <h2>Configure room settings</h2>
+    <div class="settings-wrapper container-fluid py-3">
+      <h2>Configure Room Settings</h2>
       <form method="post">
         <input type="hidden" id="ParticipantNameInput" name="participant_name" value="{{ participant_name }}">
         <input type="hidden" id="RoomIDInput" name="room_id" value="{{ room_id }}">
+
         <div class="form-group">
           <label for="correctPointsInput">Correct Points</label>
-          <input type="number" class="form-control" id="correctPointsInput" aria-describedby="correctPointsHelp" name="correct_points">
-          <small id="correctPointsHelp" class="form-text text-muted">Points for a correct answer</small>
+          <input type="number" class="form-control" id="correctPointsInput" name="correct_points">
+          <small class="form-text text-muted">Points for a correct answer</small>
         </div>
         <div class="form-group">
           <label for="earlyIncorrectPointsInput">Incorrect Points</label>
-          <input type="number" class="form-control" id="earlyIncorrectPointsInput" aria-describedby="earlyIncorrectPointsHelp" name="early_incorrect_points">
-          <small id="earlyIncorrectPointsHelp" class="form-text text-muted">Points to subtract for an early incorrect answer</small>
+          <input type="number" class="form-control" id="earlyIncorrectPointsInput" name="early_incorrect_points">
+          <small class="form-text text-muted">Points to subtract for an early incorrect answer</small>
         </div>
         <div class="form-group">
           <label for="oneBuzzPerQuestionInput">One Buzz Per Question</label>
-          {{ form.one_buzz_per_question }}  <!-- templating using the form object since there is not input 'type' for dropdowns, you would need to use a 'select' element -->
-          <small id="oneBuzzPerQuestionHelp" class="form-text text-muted">Whether a player should be locked out after guessing</small>
+          {{ form.one_buzz_per_question }}
+          <small class="form-text text-muted">Whether a player should be locked out after guessing</small>
         </div>
         <div class="form-group">
           <label for="TimeEvaluationMethodInput">Buzz Time Evaluation Method</label>
-          {{ form.time_evaluation_method }} <!-- templating using the form object since there is not input 'type' for dropdowns, you would need to use a 'select' element -->
-          <small id="timeEvaluationMethodHelp" class="form-text text-muted">The method that will be used to determine who has buzzed the fastest</small>
+          {{ form.time_evaluation_method }}
+          <small class="form-text text-muted">The method that will be used to determine who has buzzed the fastest</small>
         </div>
         <div class="form-group">
           <label for="sortLatencyInput">Sort Latency</label>
-          <input type="number" class="form-control" id="sortLatencyInput" aria-describedby="sortLatencyHelp" name="sort_latency">
-          <small id="sortLatencyHelp" class="form-text text-muted">The slowest player's connection speed in milliseconds, allows the server to sort client-side connection speeds</small>
+          <input type="number" class="form-control" id="sortLatencyInput" name="sort_latency">
+          <small class="form-text text-muted">The slowest player's connection speed in milliseconds, allows the server to sort client-side connection speeds</small>
         </div>
+
         <button class="btn btn-primary" name="submit">Update Settings</button>
       </form>
-      <br>
-      <!-- Button trigger modal -->
+
+      <hr>
       <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#resetRoomScoresModal">
         Reset Room Scores
       </button>
 
-      <!-- Modal -->
       <div class="modal fade" id="resetRoomScoresModal" tabindex="-1" role="dialog" aria-labelledby="resetRoomScoresModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -120,53 +118,78 @@
     </div>
   </div>
 </div>
-
 <script>
-
 $(document).ready(function () {
+    // --- CONSTANTS AND STATE ---
+    const ROOM_ID = '{{ room_id }}';
+    const PARTICIPANT_NAME = '{{ participant_name }}';
+    const NAMESPACE = '/friday_buzzer';
+    const AUDIO_URL = '{{ url_for('static',filename='audio/soft_beep.mp3') }}';
+    const AUDIO_ON_ICON = '{{ url_for('static',filename='images/audio_on_icon.svg') }}';
+    const AUDIO_OFF_ICON = '{{ url_for('static',filename='images/audio_off_icon.svg') }}';
 
-    var buzzes = [];
-    var locked_out_players = [];
-    var audio = new Audio('{{ url_for('static',filename='audio/soft_beep.mp3') }}');
+    let buzzes = [];
+    let lockedOutPlayers = [];
+    const audio = new Audio(AUDIO_URL);
+    audio.muted = false;
 
-    // functions to update page js, called by socket server update handlers
-    function updateBuzzLog(current_buzzes) {
-      buzz_log_html = `
-          <div class="list-group">
-      `
-      var pos = 1;
-      for (buzz of current_buzzes) {
-        if (pos == 1) {
-          buzz_log_html += `<button type="button" class="list-group-item list-group-item-success d-flex justify-content-between align-items-center"><b>` + buzz.name + `</b></button>`
-        } else {
-           secondsTimeDiffFromFirstFloat = buzz.time - current_buzzes[0].time
-           if (secondsTimeDiffFromFirstFloat >= 5) {
-              timeDiff = Math.floor(secondsTimeDiffFromFirstFloat) + ' secs'
-           } else {
-              timeDiff = Math.round(secondsTimeDiffFromFirstFloat * 1000) + 'ms'
-           }
-           buzz_log_html += `<button type="button" class="list-group-item d-flex justify-content-between align-items-center">` + buzz.name + `<span class="badge badge-primary badge-pill">+` + timeDiff + `</span></button>`
-        };
+    // --- SOCKET SETUP (The definitive fix: FORCE HTTPS) ---
+    // The client is logging 'https' and the server needs SSL. Force the client to use HTTPS.
+    // NOTE: This will require accepting the self-signed cert security warning in your browser.
+    const SOCKET_BASE_URL = 'https://' + document.domain + ':8000';
+    const SOCKET_PATH = NAMESPACE + '/socket.io'; // Flask-SocketIO path structure
 
-        pos += 1
-      }
-      buzz_log_html += "</div>"
+    console.log("Attempting Socket.IO connection to (Base URL):", SOCKET_BASE_URL, "on Path:", SOCKET_PATH);
 
-      $(".buzz-log").html(buzz_log_html)
+    // Connecting to the base URL and specifying the SocketIO path
+    const socket = io(SOCKET_BASE_URL, {
+        path: SOCKET_PATH,
+        transports: ['websocket', 'polling'],
+        forceNew: true
+    });
+
+    // --- UTILITY FUNCTIONS (omitted for brevity) ---
+
+    function nameInCurrentBuzzes(name, currentBuzzes) {
+        return currentBuzzes.some(buzz => buzz.name === name);
     }
-    //define some sample data
-     var tabledata = [];
 
-    //create Tabulator on DOM element with id "example-table"
-    var table = new Tabulator("#scoreboard2", {
-        data:tabledata,
-        // responsiveLayout:"collapse",
-        layout:"fitColumns",      //fit columns to width of table
-        responsiveLayout:true,  //hide columns that dont fit on the table
-        pagination:"local",
-        paginationSize:10,
-        paginationCounter:"rows",
-        columns:[
+    function formatTimeDifference(timeDiffSeconds) {
+        if (timeDiffSeconds >= 5) {
+            return Math.floor(timeDiffSeconds) + ' secs';
+        }
+        return Math.round(timeDiffSeconds * 1000) + 'ms';
+    }
+
+    function updateBuzzLog(currentBuzzes) {
+      if (currentBuzzes.length === 0) {
+          $(".buzz-log").html('<div class="list-group"></div>');
+          return;
+      }
+      const firstBuzzTime = currentBuzzes[0].time;
+      let buzzLogHtml = '<div class="list-group">';
+
+      currentBuzzes.forEach((buzz, index) => {
+        if (index === 0) {
+          buzzLogHtml += `<button type="button" class="list-group-item list-group-item-success d-flex justify-content-between align-items-center"><b>${buzz.name}</b></button>`;
+        } else {
+          const secondsTimeDiff = buzz.time - firstBuzzTime;
+          const timeDiffString = formatTimeDifference(secondsTimeDiff);
+          buzzLogHtml += `<button type="button" class="list-group-item d-flex justify-content-between align-items-center">${buzz.name}<span class="badge badge-primary badge-pill">+${timeDiffString}</span></button>`;
+        }
+      });
+      buzzLogHtml += '</div>';
+      $(".buzz-log").html(buzzLogHtml);
+    }
+
+    const table = new Tabulator("#scoreboard2", {
+        data: [],
+        layout: "fitColumns",
+        responsiveLayout: true,
+        pagination: "local",
+        paginationSize: 10,
+        paginationCounter: "rows",
+        columns: [
             {title:"#", field:"pos", width:50, headerHozAlign:"center"},
             {title:"Player", field:"player", hozAlign:"center", headerHozAlign:"center"},
             {title:"Score", field:"score", hozAlign:"center", headerHozAlign:"center"},
@@ -177,197 +200,110 @@ $(document).ready(function () {
         ],
     });
 
-    function updateScoreboard(player_scores) {
-      var newTableData = [];
-      var idCounter = 1;
-      for (player of player_scores) {
-        var newRow = {
-          id: idCounter,
-          pos: idCounter,
-          player: player.name,
-          score: player.score,
-          correct: player.correct_answers,
-          early: player.early_incorrect_answers,
-          streak: player.current_streak,
-          longest: player.longest_streak
-        }
-        newTableData.push(newRow);
-        idCounter += 1
-      }
+    function updateScoreboard(playerScores) {
+      const newTableData = playerScores.map((player, index) => ({
+          id: index + 1, pos: index + 1, player: player.name, score: player.score, correct: player.correct_answers, early: player.early_incorrect_answers, streak: player.current_streak, longest: player.longest_streak
+      }));
       table.clearData();
       table.addData(newTableData);
     }
-    function nameInCurrentBuzzes(participant_name, current_buzzes) {
-        for (element of current_buzzes) {
-            if (element.name == participant_name) {
-                return true;
-            }
+
+    function updateBuzzerColour(currentBuzzes, lockedOutPlayers) {
+        const $buzzButton = $("#buzz");
+        $buzzButton.removeClass("btn-success btn-warning btn-light btn-danger");
+
+        if (currentBuzzes.length > 0 && currentBuzzes[0].name === PARTICIPANT_NAME) {
+            $buzzButton.addClass("btn-success");
+            $buzzButton.html("<b>ANSWER NOW</b>");
+        } else if (currentBuzzes.length > 0 && nameInCurrentBuzzes(PARTICIPANT_NAME, currentBuzzes)) {
+            $buzzButton.addClass("btn-warning");
+            $buzzButton.html("<b>Someone beat you to it...</b><br>Please wait");
+        } else if (lockedOutPlayers.includes(PARTICIPANT_NAME)) {
+            $buzzButton.addClass("btn-light");
+            $buzzButton.html("<b>You have already buzzed this question</b><br>If this is not expected, ask for a reset");
+        } else {
+            $buzzButton.addClass("btn-danger");
+            $buzzButton.html("Buzz");
         }
-        return false;
     }
 
-    function updateBuzzerColour(current_buzzes, locked_out_players) {
-       if (current_buzzes.length > 0 && current_buzzes[0].name == "{{ participant_name }}") {
-           $("#buzz").removeClass("btn-danger")
-           $("#buzz").removeClass("btn-warning")
-           $("#buzz").removeClass("btn-light")
-           $("#buzz").addClass("btn-success")
-           $("#buzz").html("<b>ANSWER NOW</b>")
-       } else if (current_buzzes.length > 0 && nameInCurrentBuzzes("{{ participant_name }}", current_buzzes)) {
-             $("#buzz").removeClass("btn-danger")
-             $("#buzz").removeClass("btn-success")
-             $("#buzz").removeClass("btn-light")
-             $("#buzz").addClass("btn-warning")
-             $("#buzz").html("<b>Someone beat you to it...</b><br>Please wait")
-       } else if (locked_out_players.includes("{{ participant_name }}")) {
-             $("#buzz").removeClass("btn-danger")
-             $("#buzz").removeClass("btn-warning")
-             $("#buzz").removeClass("btn-success")
-             $("#buzz").addClass("btn-light")
-             $("#buzz").html("<b>You have already buzzed this question</b><br>If this is not expected, ask for a reset")
-        } else {
-           $("#buzz").removeClass("btn-success")
-           $("#buzz").removeClass("btn-warning")
-           $("#buzz").removeClass("btn-light")
-           $("#buzz").addClass("btn-danger")
-           $("#buzz").html("Buzz")
-        }
-    };
-
-    function updateSettings(config) {  //TODO needs rewrite as any buzz will overwrite this! very buggy!
-      $("#correctPointsInput").val(config.correct_points)
-      $("#earlyIncorrectPointsInput").val(config.early_incorrect_points)
-      $("#timeEvaluationMethodInput").val(config.time_evaluation_method)
-      $("#oneBuzzPerQuestionInput").val(config.one_buzz_per_question.toString())
-      $("#sortLatencyInput").val(config.sort_latency)
-    };
+    function updateSettings(config) {
+      $("#correctPointsInput").val(config.correct_points);
+      $("#earlyIncorrectPointsInput").val(config.early_incorrect_points);
+      $("#timeEvaluationMethodInput").val(config.time_evaluation_method);
+      $("#oneBuzzPerQuestionInput").val(config.one_buzz_per_question.toString());
+      $("#sortLatencyInput").val(config.sort_latency);
+    }
 
     function alertServerMaintenance(should) {
+      const snackbar = document.getElementById("snackbar");
       if (should) {
-        var x = document.getElementById("snackbar");
-        x.className = "showSnackbar";
-        setTimeout(function(){ x.className = x.className.replace("showSnackbar", ""); }, 30000);
+        snackbar.className = "showSnackbar";
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("showSnackbar", "");
+        }, 30000);
       }
-    };
-    // create socket connection when you join a room on the server
-    namespace = '/friday_buzzer';
-    var socket = io(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+    }
 
-    // basic handlers for socket connection and disconnection
+    // --- SOCKET HANDLERS ---
     socket.on('connect', function() {
-        console.log("Socket successfully connected")
-        socket.emit('join_room', {"room_id":'{{ room_id }}', "participant_name": '{{ participant_name }}'});
+        console.log("Socket successfully connected.");
+        socket.emit('join_room', {"room_id": ROOM_ID, "participant_name": PARTICIPANT_NAME});
     });
+
     socket.on('disconnect', function() {
-        console.log("Socket disconnected")
-        socket.emit('leave_room', {"room_id":'{{ room_id }}', "participant_name": '{{ participant_name }}'});
+        console.log("Socket disconnected.");
     });
 
-
-    // handlers for button clicks
-    $("#buzz").on("click", function () {
-      time = (new Date).getTime()  // evaluate buzz time client side for fairness
-      console.log("Player clicked buzzer")
-      for (buzz of buzzes) {
-          if (buzz.name == '{{ participant_name }}') {
-              console.log('{{ participant_name }}' + "already buzzed")
-              return;
-          }
-      }
-      for (player_name of locked_out_players) {
-          if (player_name == '{{ participant_name }}') {
-              console.log('{{ participant_name }}' + "is locked out")
-              return;
-          }
-      }
-      console.log('emitting buzz');
-      socket.emit("buzz", {"participant_name": '{{ participant_name }}',
-                           "room_id": '{{ room_id }}',
-                           "buzz_time": time})
-
-    });
-
-    $("#correct").on("click", function () {
-      console.log("Answer was correct")
-      socket.emit("correct", {"participant_name": '{{ participant_name }}',
-                           "room_id": '{{ room_id }}'})
-    });
-
-    $("#standard_incorrect").on("click", function () {
-      console.log("Player was incorrect after the question had finished")
-      socket.emit("standard_incorrect", {"participant_name": '{{ participant_name }}',
-                           "room_id": '{{ room_id }}'})
-    });
-
-    $("#early_incorrect").on("click", function () {
-      console.log("Player was incorrect before the question had finished")
-      socket.emit("early_incorrect", {"participant_name": '{{ participant_name }}',
-                           "room_id": '{{ room_id }}'})
-    });
-
-    $("#reset_buzzer").on("click", function () {
-      console.log("Player reset buzzer")
-      socket.emit("reset_buzzer", {"participant_name": '{{ participant_name }}',
-                           "room_id": '{{ room_id }}'})
-    });
-
-    $("#reset_room_scores").on("click", function () {
-      console.log("Room scores reset")
-      socket.emit("reset_room_scores", {"participant_name": '{{ participant_name }}',
-                                        "room_id": '{{ room_id }}'})
-    });
-
-    $("#collapsableNavbarComponents").on("mouseup", function() {
-      $(this).removeClass("in");
-    });
-
-    // handler for responses from the server
     socket.on('server_room_update', function(payload) {
-      console.log("Server updated the room");
-      payload = JSON.parse(payload);
-      buzzes = payload.current_buzzes
-      locked_out_players = payload.locked_out_players
+      const data = JSON.parse(payload);
+      buzzes = data.current_buzzes;
+      lockedOutPlayers = data.locked_out_players;
 
-      if (payload.play_audio) {
+      if (data.play_audio && !audio.muted) {
         audio.play();
       }
-
       updateBuzzLog(buzzes);
-      updateScoreboard(payload.scoreboard);
-      updateBuzzerColour(payload.current_buzzes, payload.locked_out_players);
-      updateSettings(payload.config);
-      alertServerMaintenance(payload.server_maintenance_alert);
+      updateScoreboard(data.scoreboard);
+      updateBuzzerColour(data.current_buzzes, data.locked_out_players);
+      updateSettings(data.config);
+      alertServerMaintenance(data.server_maintenance_alert);
     });
-
-
-    // attempt to sync client time to server
-    var latency_results = [];
-    var average_latency;
 
     function ping() {
-      console.log("Pinging server")
-      time = (new Date).getTime()  // evaluate time client side
-      socket.emit("my_ping", {"participant_name": '{{ participant_name }}',
-                           "room_id": '{{ room_id }}',
-                           "client_side_time": time})
-    };
-    $("#audio_button").on("click", function () {
-        if (audio.muted) {
-          audio.muted = false;
-          this.innerHTML = "<img src='{{ url_for('static',filename='images/audio_on_icon.svg') }}'/>";
-          console.log("turned on audio");
-        } else {
-          audio.muted = true;
-          this.innerHTML = "<img src='{{ url_for('static',filename='images/audio_off_icon.svg') }}'/>";
-          console.log("turned OFF audio");
-        }
+      const time = (new Date).getTime();
+      socket.emit("my_ping", {"participant_name": PARTICIPANT_NAME, "room_id": ROOM_ID, "client_side_time": time});
+    }
+
+    // --- EVENT LISTENERS (CLICKS) ---
+    $("#buzz").on("click", function () {
+      const time = (new Date).getTime();
+      if (nameInCurrentBuzzes(PARTICIPANT_NAME, buzzes) || lockedOutPlayers.includes(PARTICIPANT_NAME)) { return; }
+      const dataToSend = {"participant_name": PARTICIPANT_NAME, "room_id": ROOM_ID, "buzz_time": time};
+      console.log('✅ Emitting event "buzz" with data:', dataToSend);
+      socket.emit("buzz", dataToSend);
     });
-    ping(); // do immediately on page load
-    window.setInterval(function(){
-          ping();
-    }, 20000);  // once every 20 seconds for now
+
+    const hostEvents = {'#correct': 'correct', '#standard_incorrect': 'standard_incorrect', '#early_incorrect': 'early_incorrect', '#reset_buzzer': 'reset_buzzer', '#reset_room_scores': 'reset_room_scores'};
+    for (const [selector, eventName] of Object.entries(hostEvents)) {
+        $(selector).on("click", function () {
+            const dataToSend = {"participant_name": PARTICIPANT_NAME, "room_id": ROOM_ID};
+            console.log(`✅ Host emitting event "${eventName}" with data:`, dataToSend);
+            socket.emit(eventName, dataToSend);
+        });
+    }
+
+    $("#audio_button").on("click", function () {
+        audio.muted = !audio.muted;
+        this.innerHTML = audio.muted ? `<img src="${AUDIO_OFF_ICON}" alt="Audio Off Icon"/>` : `<img src="${AUDIO_ON_ICON}" alt="Audio On Icon"/>`;
+        console.log("Audio Toggled:", audio.muted ? "OFF" : "ON");
+    });
+    $("#collapsableNavbarComponents").on("mouseup", function() { $(this).removeClass("in"); });
 
 
+    // --- INITIALIZATION AND TIMERS ---
+    ping();
+    window.setInterval(ping, 20000);
 });
 </script>
 {% endblock %}
