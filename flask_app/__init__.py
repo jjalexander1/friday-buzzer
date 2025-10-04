@@ -8,8 +8,19 @@ from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
-socketio = SocketIO(async_mode="eventlet")
-namespace = '/friday_buzzer'
+
+# --- START: SOCKETIO CONFIGURATION UPDATE ---
+socketio = SocketIO(
+    async_mode="eventlet",
+    cors_allowed_origins='*',
+    # CRITICAL FIX: Explicitly allow the old EIO=3 protocol
+    engineio_options={'ping_interval': 5, 'ping_timeout': 30, 'json': None}
+)
+# --- END: SOCKETIO CONFIGURATION UPDATE ---
+
+# REMOVED: namespace = '/friday_buzzer'
+namespace = None  # Retain a placeholder to avoid breaking 'from flask_app import namespace' if other files use it
+
 thread = None
 room_manager = RoomManager()
 login_manager = LoginManager()

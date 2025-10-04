@@ -4,12 +4,11 @@ services:
       context: .
     ports:
       - "8000:8000"
-    volumes:
-      - ./certs:/app/certs  # Mount SSL certs if you want them inside
+    # CHANGE: Remove the certs volume mount entirely
+    # volumes:
+    #   - ./certs:/app/certs  # REMOVE THIS LINE
     environment:
       - FLASK_ENV=production
     restart: unless-stopped
-    command: >
-      gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:8000 run:app 
-      --keyfile /app/certs/key.pem 
-      --certfile /app/certs/cert.pem
+    # CHANGE: Remove all SSL arguments from the command
+    command: gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:8000 run:app

@@ -14,4 +14,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Use eventlet for SocketIO (important for async)
-CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", "0.0.0.0:8000", "run:app", "--keyfile", "/app/certs/key.pem", "--certfile", "/app/certs/cert.pem"]
+# CHANGE: Remove --keyfile, --certfile, and --cert-reqs
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", "0.0.0.0:8000", "run:app"]

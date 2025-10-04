@@ -18,6 +18,7 @@ from flask_login import (
     login_user,
     logout_user,
 )
+
 from flask_socketio import (
     SocketIO,
     emit,
@@ -27,7 +28,7 @@ from flask_socketio import (
 
 # Application-specific modules
 from backend import RoomManager
-from flask_app import app, forms, models, namespace, room_manager, socketio
+from flask_app import app, forms, models, room_manager, socketio
 from flask_app.forms import ParticipantNameForm, RoomSettingsForm
 from flask_app.models import User
 
@@ -165,7 +166,7 @@ def application_error(err):
 
 # --- SocketIO Handlers ---
 
-@socketio.on('buzz', namespace=namespace)
+@socketio.on('buzz')
 def handle_buzz(data: Dict[str, Any]) -> None:
     """Handles a player buzzing in."""
     server_side_time = datetime.datetime.now().timestamp()
@@ -189,7 +190,7 @@ def handle_buzz(data: Dict[str, Any]) -> None:
     )
 
 
-@socketio.on('reset_buzzer', namespace=namespace)
+@socketio.on('reset_buzzer')
 def handle_buzzer_reset(data: Dict[str, Any]) -> None:
     """Handles the host resetting the buzzer."""
     room = room_manager.get_room(data['room_id'])
@@ -205,7 +206,7 @@ def handle_buzzer_reset(data: Dict[str, Any]) -> None:
     )
 
 
-@socketio.on('reset_room_scores', namespace=namespace)
+@socketio.on('reset_room_scores')
 def handle_scores_reset(data: Dict[str, Any]) -> None:
     """Handles the host resetting all player scores in a room."""
     room = room_manager.get_room(data['room_id'])
@@ -221,7 +222,7 @@ def handle_scores_reset(data: Dict[str, Any]) -> None:
     )
 
 
-@socketio.on('correct', namespace=namespace)
+@socketio.on('correct')
 def handle_correct(data: Dict[str, Any]) -> None:
     """Handles the host marking the last buzz as correct."""
     room = room_manager.get_room(data['room_id'])
@@ -237,7 +238,7 @@ def handle_correct(data: Dict[str, Any]) -> None:
     )
 
 
-@socketio.on('standard_incorrect', namespace=namespace)
+@socketio.on('standard_incorrect')
 def handle_standard_incorrect(data: Dict[str, Any]) -> None:
     """Handles the host marking the last buzz as incorrect (standard)."""
     room = room_manager.get_room(data['room_id'])
@@ -253,7 +254,7 @@ def handle_standard_incorrect(data: Dict[str, Any]) -> None:
     )
 
 
-@socketio.on('early_incorrect', namespace=namespace)
+@socketio.on('early_incorrect')
 def handle_early_incorrect(data: Dict[str, Any]) -> None:
     """Handles the host marking the last buzz as incorrect (early/penalty)."""
     room = room_manager.get_room(data['room_id'])
@@ -269,13 +270,13 @@ def handle_early_incorrect(data: Dict[str, Any]) -> None:
     )
 
 
-@socketio.on('join_room', namespace=namespace)
+@socketio.on('join_room')
 def handle_join_room(data: Dict[str, Any]) -> None:
     """Handles a client joining a room and broadcasting the initial state."""
     room_id = data['room_id']
     participant_name = data['participant_name']
 
-    join_room(room_id, namespace=namespace)
+    join_room(room_id)
 
     room_manager.add_room_if_not_exists(room_id)
     room = room_manager.get_room(room_id)
@@ -298,10 +299,10 @@ def handle_join_room(data: Dict[str, Any]) -> None:
         broadcast_to_all_rooms(payload=maintenance_payload)
 
 
-@socketio.on('leave_room', namespace=namespace)
+@socketio.on('leave_room')
 def handle_leave_room(data: Dict[str, Any]) -> None:
     """Handles a client leaving a room."""
-    leave_room(data['room_id'], namespace=namespace)
+    leave_room(data['room_id'])
 
     log_message_received(
         sent_from=data['participant_name'],
@@ -310,7 +311,7 @@ def handle_leave_room(data: Dict[str, Any]) -> None:
     )
 
 
-@socketio.on('my_ping', namespace=namespace)
+@socketio.on('my_ping')
 def handle_ping(data: Dict[str, Any]) -> None:
     """Handles client-side pings for latency calculation."""
     server_side_time = datetime.datetime.now().timestamp()

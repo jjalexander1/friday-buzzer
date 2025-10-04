@@ -30,7 +30,24 @@
 
   <div id="scoreboard" class="tab-pane fade">
     <div class="container-fluid py-3">
-      <div id="scoreboard2"></div>
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered text-center" id="scoreboard_table">
+          <thead class="thead-dark text-center">
+            <tr>
+              <th>#</th>
+              <th>Player</th>
+              <th>Score</th>
+              <th>Correct</th>
+              <th>Early Incorrect</th>
+              <th>Streak</th>
+              <th>Longest</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Score rows will be inserted here dynamically -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -118,37 +135,24 @@
     </div>
   </div>
 </div>
+
 <script>
 $(document).ready(function () {
-    // --- CONSTANTS AND STATE ---
     const ROOM_ID = '{{ room_id }}';
     const PARTICIPANT_NAME = '{{ participant_name }}';
-    const NAMESPACE = '/friday_buzzer';
     const AUDIO_URL = '{{ url_for('static',filename='audio/soft_beep.mp3') }}';
     const AUDIO_ON_ICON = '{{ url_for('static',filename='images/audio_on_icon.svg') }}';
     const AUDIO_OFF_ICON = '{{ url_for('static',filename='images/audio_off_icon.svg') }}';
-
     let buzzes = [];
     let lockedOutPlayers = [];
     const audio = new Audio(AUDIO_URL);
     audio.muted = false;
-
-    // --- SOCKET SETUP (The definitive fix: FORCE HTTPS) ---
-    // The client is logging 'https' and the server needs SSL. Force the client to use HTTPS.
-    // NOTE: This will require accepting the self-signed cert security warning in your browser.
-    const SOCKET_BASE_URL = 'https://' + document.domain + ':8000';
-    const SOCKET_PATH = NAMESPACE + '/socket.io'; // Flask-SocketIO path structure
-
-    console.log("Attempting Socket.IO connection to (Base URL):", SOCKET_BASE_URL, "on Path:", SOCKET_PATH);
-
-    // Connecting to the base URL and specifying the SocketIO path
+    const SOCKET_BASE_URL = 'http://' + document.domain + ':8000';
     const socket = io(SOCKET_BASE_URL, {
-        path: SOCKET_PATH,
         transports: ['websocket', 'polling'],
-        forceNew: true
+        forceNew: true,
+        query: { room_id: ROOM_ID }
     });
-
-    // --- UTILITY FUNCTIONS (omitted for brevity) ---
 
     function nameInCurrentBuzzes(name, currentBuzzes) {
         return currentBuzzes.some(buzz => buzz.name === name);
@@ -168,7 +172,6 @@ $(document).ready(function () {
       }
       const firstBuzzTime = currentBuzzes[0].time;
       let buzzLogHtml = '<div class="list-group">';
-
       currentBuzzes.forEach((buzz, index) => {
         if (index === 0) {
           buzzLogHtml += `<button type="button" class="list-group-item list-group-item-success d-flex justify-content-between align-items-center"><b>${buzz.name}</b></button>`;
@@ -182,48 +185,35 @@ $(document).ready(function () {
       $(".buzz-log").html(buzzLogHtml);
     }
 
-    const table = new Tabulator("#scoreboard2", {
-        data: [],
-        layout: "fitColumns",
-        responsiveLayout: true,
-        pagination: "local",
-        paginationSize: 10,
-        paginationCounter: "rows",
-        columns: [
-            {title:"#", field:"pos", width:50, headerHozAlign:"center"},
-            {title:"Player", field:"player", hozAlign:"center", headerHozAlign:"center"},
-            {title:"Score", field:"score", hozAlign:"center", headerHozAlign:"center"},
-            {title:"Correct", field:"correct", hozAlign:"center", headerHozAlign:"center"},
-            {title:"Early", field:"early", hozAlign:"center", headerHozAlign:"center"},
-            {title:"Streak", field:"streak", hozAlign:"center", headerHozAlign:"center"},
-            {title:"Longest", field:"longest", hozAlign:"center", headerHozAlign:"center"},
-        ],
-    });
-
     function updateScoreboard(playerScores) {
-      const newTableData = playerScores.map((player, index) => ({
-          id: index + 1, pos: index + 1, player: player.name, score: player.score, correct: player.correct_answers, early: player.early_incorrect_answers, streak: player.current_streak, longest: player.longest_streak
-      }));
-      table.clearData();
-      table.addData(newTableData);
+      const tbody = $("#scoreboard_table tbody");
+      tbody.empty();
+      playerScores.forEach((player, index) => {
+        tbody.append(`
+          <tr>
+            <td>${index + 1}</td>
+            <td>${player.name}</td>
+            <td>${player.score}</td>
+            <td>${player.correct_answers}</td>
+            <td>${player.early_incorrect_answers}</td>
+            <td>${player.current_streak}</td>
+            <td>${player.longest_streak}</td>
+          </tr>
+        `);
+      });
     }
 
     function updateBuzzerColour(currentBuzzes, lockedOutPlayers) {
         const $buzzButton = $("#buzz");
         $buzzButton.removeClass("btn-success btn-warning btn-light btn-danger");
-
         if (currentBuzzes.length > 0 && currentBuzzes[0].name === PARTICIPANT_NAME) {
-            $buzzButton.addClass("btn-success");
-            $buzzButton.html("<b>ANSWER NOW</b>");
+            $buzzButton.addClass("btn-success").html("<b>ANSWER NOW</b>");
         } else if (currentBuzzes.length > 0 && nameInCurrentBuzzes(PARTICIPANT_NAME, currentBuzzes)) {
-            $buzzButton.addClass("btn-warning");
-            $buzzButton.html("<b>Someone beat you to it...</b><br>Please wait");
+            $buzzButton.addClass("btn-warning").html("<b>Someone beat you to it...</b><br>Please wait");
         } else if (lockedOutPlayers.includes(PARTICIPANT_NAME)) {
-            $buzzButton.addClass("btn-light");
-            $buzzButton.html("<b>You have already buzzed this question</b><br>If this is not expected, ask for a reset");
+            $buzzButton.addClass("btn-light").html("<b>You have already buzzed this question</b><br>If this is not expected, ask for a reset");
         } else {
-            $buzzButton.addClass("btn-danger");
-            $buzzButton.html("Buzz");
+            $buzzButton.addClass("btn-danger").html("Buzz");
         }
     }
 
@@ -239,30 +229,22 @@ $(document).ready(function () {
       const snackbar = document.getElementById("snackbar");
       if (should) {
         snackbar.className = "showSnackbar";
-        setTimeout(() => {
-            snackbar.className = snackbar.className.replace("showSnackbar", "");
-        }, 30000);
+        setTimeout(() => { snackbar.className = snackbar.className.replace("showSnackbar", ""); }, 30000);
       }
     }
 
-    // --- SOCKET HANDLERS ---
     socket.on('connect', function() {
-        console.log("Socket successfully connected.");
+        console.log("Socket successfully connected to:", socket.io.uri);
         socket.emit('join_room', {"room_id": ROOM_ID, "participant_name": PARTICIPANT_NAME});
     });
 
-    socket.on('disconnect', function() {
-        console.log("Socket disconnected.");
-    });
+    socket.on('disconnect', function() { console.log("Socket disconnected."); });
 
     socket.on('server_room_update', function(payload) {
       const data = JSON.parse(payload);
       buzzes = data.current_buzzes;
       lockedOutPlayers = data.locked_out_players;
-
-      if (data.play_audio && !audio.muted) {
-        audio.play();
-      }
+      if (data.play_audio && !audio.muted) { audio.play(); }
       updateBuzzLog(buzzes);
       updateScoreboard(data.scoreboard);
       updateBuzzerColour(data.current_buzzes, data.locked_out_players);
@@ -275,33 +257,25 @@ $(document).ready(function () {
       socket.emit("my_ping", {"participant_name": PARTICIPANT_NAME, "room_id": ROOM_ID, "client_side_time": time});
     }
 
-    // --- EVENT LISTENERS (CLICKS) ---
     $("#buzz").on("click", function () {
       const time = (new Date).getTime();
       if (nameInCurrentBuzzes(PARTICIPANT_NAME, buzzes) || lockedOutPlayers.includes(PARTICIPANT_NAME)) { return; }
-      const dataToSend = {"participant_name": PARTICIPANT_NAME, "room_id": ROOM_ID, "buzz_time": time};
-      console.log('✅ Emitting event "buzz" with data:', dataToSend);
-      socket.emit("buzz", dataToSend);
+      socket.emit("buzz", {"participant_name": PARTICIPANT_NAME, "room_id": ROOM_ID, "buzz_time": time});
     });
 
     const hostEvents = {'#correct': 'correct', '#standard_incorrect': 'standard_incorrect', '#early_incorrect': 'early_incorrect', '#reset_buzzer': 'reset_buzzer', '#reset_room_scores': 'reset_room_scores'};
     for (const [selector, eventName] of Object.entries(hostEvents)) {
         $(selector).on("click", function () {
-            const dataToSend = {"participant_name": PARTICIPANT_NAME, "room_id": ROOM_ID};
-            console.log(`✅ Host emitting event "${eventName}" with data:`, dataToSend);
-            socket.emit(eventName, dataToSend);
+            socket.emit(eventName, {"participant_name": PARTICIPANT_NAME, "room_id": ROOM_ID});
         });
     }
 
     $("#audio_button").on("click", function () {
         audio.muted = !audio.muted;
         this.innerHTML = audio.muted ? `<img src="${AUDIO_OFF_ICON}" alt="Audio Off Icon"/>` : `<img src="${AUDIO_ON_ICON}" alt="Audio On Icon"/>`;
-        console.log("Audio Toggled:", audio.muted ? "OFF" : "ON");
     });
     $("#collapsableNavbarComponents").on("mouseup", function() { $(this).removeClass("in"); });
 
-
-    // --- INITIALIZATION AND TIMERS ---
     ping();
     window.setInterval(ping, 20000);
 });
